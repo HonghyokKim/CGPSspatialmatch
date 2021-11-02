@@ -1,10 +1,10 @@
 #' matchdist function
 #'
-#' This function matches exposed units and unexposed units by a pre-specified buffer distance (Euclidian distance)
+#' This function matches exposed units and unexposed units by a pre-specified buffer distance (Euclidean distance)
 #' @param data a dataset object.
 #' @param bexp a character string indicating the name of the binary exposure. Use apostrophe like "VariableName"
-#' @param x a numeric vector indicating longitude of observation units
-#' @param y a numeric vector indicating latitude of observation units
+#' @param x a character string indicating the name of the longitude variable of observation units
+#' @param y a character string indicating the name of the latitude variable of observation units
 #' @param exp.status a numeric vector indicating the value indicating exposed units. Defalut=1
 #' @param distbuf a numeric vector indicating the buffer distance by which exposed units and unexposed units are matched
 #' @param exp.included an indicator of whether exposed units are matched with not only unexposed units but also other exposed units. Defalut is TRUE. If FALSE, exposed units are matched with only unexposed units. See details
@@ -15,12 +15,11 @@
 
 matchdist<-function(data,bexp,x,y,exp.status=1,distbuf=0.1,exp.included=TRUE,replace=TRUE) {
   start.time<-Sys.time()
-  bexp_st<-deparse(substitute(bexp))
-  long<-deparse(substitute(x))
-  lat<-deparse(substitute(y))
-  NUM_EXP <- sum(data[,bexp_st]==exp.status)
-  data[,paste0(bexp_st,"2")] <- data[,bexp_st]
-  data[,paste0(bexp_st,"2")][data[,paste0(bexp_st,"2")]==exp.status] <-seq(NUM_EXP)
+  long<-x
+  lat<-y
+  NUM_EXP <- sum(data[,bexp]==exp.status)
+  data[,paste0(bexp,"2")] <- data[,bexp]
+  data[,paste0(bexp,"2")][data[,paste0(bexp,"2")]==exp.status] <-seq(NUM_EXP)
   strata<-vector("list",NUM_EXP)
   data[,"FID"] <-seq(nrow(data))
   not.matched.exp<-NULL
@@ -28,12 +27,12 @@ matchdist<-function(data,bexp,x,y,exp.status=1,distbuf=0.1,exp.included=TRUE,rep
   for (ii in seq(NUM_EXP)) {
     
     if(exp.included==FALSE) {
-      match.sample<-rbind(data[data[,paste0(bexp_st,"2")]==ii,],
-                          data[data[,bexp_st] != exp.status,])
+      match.sample<-rbind(data[data[,paste0(bexp,"2")]==ii,],
+                          data[data[,bexp] != exp.status,])
     }
     if(exp.included==TRUE) {
-      match.sample<-rbind(data[data[,paste0(bexp_st,"2")]==ii,],
-                          data[data[,paste0(bexp_st,"2")] != ii,])
+      match.sample<-rbind(data[data[,paste0(bexp,"2")]==ii,],
+                          data[data[,paste0(bexp,"2")] != ii,])
     }
     match.sample$nearestdist<-0
     match.sample$matchdist<-0
@@ -52,11 +51,11 @@ matchdist<-function(data,bexp,x,y,exp.status=1,distbuf=0.1,exp.included=TRUE,rep
     
     if(length(match_num)>0L) {
       nearest_match<-as.integer(rev(names(dist.mat[dist.mat==min(dist.mat,na.rm=T)]))[1])
-      match.sample[match.sample[,bexp_st]==1,"nearestdist"] <-1
+      match.sample[match.sample[,bexp]==1,"nearestdist"] <-1
       match.sample[nearest_match,"nearestdist"] <-1
       match.sample[match_num,"matchdist"] <- matching.dist
       
-      index<-match.sample[match.sample[,paste0(bexp_st,"2")]==ii,]
+      index<-match.sample[match.sample[,paste0(bexp,"2")]==ii,]
       ref<-match.sample[match_num,]
       index[,"index"]<-1
       ref[,"index"]<-0
@@ -65,17 +64,17 @@ matchdist<-function(data,bexp,x,y,exp.status=1,distbuf=0.1,exp.included=TRUE,rep
       strata[[ii]]$strata_matchdist<-ii
       #print(match.sample[match_num,"FID"])
       matched.units.row<-match.sample[match_num,"FID"]
-      matched.exp<-rbind(matched.exp,match.sample[match.sample[,paste0(bexp_st,"2")]==ii,])
+      matched.exp<-rbind(matched.exp,match.sample[match.sample[,paste0(bexp,"2")]==ii,])
     }
     else {
-      not.matched.exp<-rbind(not.matched.exp,match.sample[match.sample[,paste0(bexp_st,"2")]==ii,])
+      not.matched.exp<-rbind(not.matched.exp,match.sample[match.sample[,paste0(bexp,"2")]==ii,])
     }
     if(replace==FALSE) {
       if(is.null(matched.units.row) != TRUE) {
         data<-subset(data, FID %!in% matched.units.row)
         if(exp.included==TRUE) {
           selected<-match.sample[match_num,]
-          exp.selected <- selected[selected[,bexp_st]==exp.status,]
+          exp.selected <- selected[selected[,bexp]==exp.status,]
           matched.exp <- rbind(matched.exp,exp.selected)
         }
       }
@@ -85,10 +84,10 @@ matchdist<-function(data,bexp,x,y,exp.status=1,distbuf=0.1,exp.included=TRUE,rep
     }
   }
   if(is.null(not.matched.exp) ==FALSE) {
-    not.matched.exp<-not.matched.exp[order(not.matched.exp[,paste0(bexp_st,"2")]),]
+    not.matched.exp<-not.matched.exp[order(not.matched.exp[,paste0(bexp,"2")]),]
   }
   if(is.null(matched.exp) ==FALSE) {
-    matched.exp<-matched.exp[order(matched.exp[,paste0(bexp_st,"2")]),]
+    matched.exp<-matched.exp[order(matched.exp[,paste0(bexp,"2")]),]
   }
   
   matched<-do.call(rbind,strata)
@@ -103,8 +102,8 @@ matchdist<-function(data,bexp,x,y,exp.status=1,distbuf=0.1,exp.included=TRUE,rep
     matched_exp_count<-length(unique(matched[,"strata_matchdist"]))
     
     if(exp.included==TRUE & replace==FALSE) {
-      matched[matched[,bexp_st]==exp.status,"index"]<-1
-      matched_exp_count<-sum(matched[matched[,bexp_st]==exp.status,"index"])
+      matched[matched[,bexp]==exp.status,"index"]<-1
+      matched_exp_count<-sum(matched[matched[,bexp]==exp.status,"index"])
       cat("Recommend not to use this for GPS matching
             If you use this for GPS matching, GPS of onlythe first row of exposed units in strata where more than one exposed units exist 
           is used for matching criteria

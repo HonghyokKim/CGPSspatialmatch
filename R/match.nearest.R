@@ -1,6 +1,6 @@
 #' match.nearest function
 #'
-#' This internal function is
+#' This internal function matches units by the generalized propensity score computed by cgpsmatch function. This function is used only within cgpsmatch function.
 #' @export
 #' @examples 
 #' match.nearest()
