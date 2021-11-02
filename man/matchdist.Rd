@@ -20,9 +20,9 @@ matchdist(
 
 \item{bexp}{a character string indicating the name of the binary exposure. Use apostrophe like "VariableName"}
 
-\item{x}{a numeric vector indicating longitude of observation units}
+\item{x}{a character string indicating the name of the longitude variable of observation units}
 
-\item{y}{a numeric vector indicating latitude of observation units}
+\item{y}{a character string indicating the name of the latitude variable of observation units}
 
 \item{exp.status}{a numeric vector indicating the value indicating exposed units. Defalut=1}
 
@@ -33,7 +33,7 @@ matchdist(
 \item{replace}{an indicator of whether matching is done with replacement. Default is TRUE. If FALSE, matching is done without replacement. If FALSE, note that the output of this function may differ by the order of observation units in the original dataset.}
 }
 \description{
-This function matches exposed units and unexposed units by a pre-specified buffer distance (Euclidian distance)
+This function matches exposed units and unexposed units by a pre-specified buffer distance (Euclidean distance)
 }
 \examples{
 matchdist()

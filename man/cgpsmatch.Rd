@@ -8,6 +8,7 @@ cgpsmatch(
   data,
   bexp,
   cexp,
+  ps,
   model.exponly,
   expstatus = 1,
   method = NULL,
@@ -22,17 +23,17 @@ cgpsmatch(
 
 \item{cexp}{a character string indicating the name of the continuous exposure variable. Use apostrophe like "VariableName"}
 
+\item{ps}{a character string indicating the name of propensity score.}
+
 \item{model.exponly}{a regression model object that is a generlized propensity score regression model fitted using only exposed units.}
 
-\item{method}{a character string indicating the matching method used to conduct matching. Defalut is NULL. If NULL, only generalized propensity score is computed and matching is not done. Options include "nearest" (nearest neighbor matching) and "caliper" (caliper matching)}
+\item{method}{a character string indicating the matching method used to conduct matching. Default is NULL. If NULL, only generalized propensity score is computed and matching is not done. Options include "nearest" (nearest neighbor matching) and "caliper" (caliper matching)}
 
-\item{caliper_bw}{a numeric vector indicating caliper bandwidth. Defalut is 0.2. If method is "nearest", this parameter is ignored.}
+\item{caliper_bw}{a numeric vector indicating caliper bandwidth. Default is 0.2. If method is "nearest", this parameter is ignored.}
 
 \item{replace}{an indicator of whether matching is done with replacement. Default is TRUE. If FALSE, matching is done without replacement. If FALSE, note that the output of this function may differ by the order of observation units in the original dataset.}
 
-\item{ps}{a character string indicating the name of propensity score.}
-
-\item{exp.status}{the value indicating exposed units. Defalut=1}
+\item{exp.status}{the value indicating exposed units. Default is 1}
 }
 \description{
 This function computes generalized propensity score for exposed and unexposed units using the product of the propensity score and the conditional generalized propensity score and/or conducts matching by this generalized propensity score.

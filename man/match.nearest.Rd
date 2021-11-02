@@ -7,7 +7,7 @@
 match.nearest(data, bexp, gpsname, index.status = 1, replace2 = TRUE)
 }
 \description{
-This internal function is
+This internal function matches units by the generalized propensity score computed by cgpsmatch function. This function is used only within cgpsmatch function.
 }
 \examples{
 match.nearest()
