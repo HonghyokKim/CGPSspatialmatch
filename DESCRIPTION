@@ -1,0 +1,12 @@
+Package: CGPSspatialmatch
+Title: Conditional Generalized Propensity Score-based Spatial Matching
+Version: 0.0.0.1000
+Authors@R: 
+    person("Honghyok", "Kim", , "honghyok.kim@yale.edu", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0001-9636-3428"))
+Description: Conditional Generalized Propensity Score-based Spatial Matching (Under development).
+License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
+    license
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.2
