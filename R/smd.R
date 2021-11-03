@@ -11,6 +11,8 @@
 smd<-function(data,bexp,exp.status=1,varinames=NULL) {
   exposed <- data[data[,bexp] == exp.status,]
   unexposed <- data[data[,bexp] != exp.status,]
+  
+  if( nrow(exposed) * nrow(unexposed)>0) {
   exposed$W<-1
   unexposed$W<-1
   exposed.w.m<-sapply(data.frame(exposed[,varinames]),FUN=w.m,w=exposed$W)
@@ -18,6 +20,10 @@ smd<-function(data,bexp,exp.status=1,varinames=NULL) {
   exposed.w.sd<-sapply(data.frame(exposed[,varinames]),FUN=w.sd,w=exposed$W)
   unexposed.w.sd<-sapply(data.frame(unexposed[,varinames]),FUN=w.sd,w=unexposed$W)
   result<-(exposed.w.m-unexposed.w.m)/sqrt((exposed.w.sd^2+unexposed.w.sd^2)/2)
+  }
+  else {
+    result<-rep(NA,length(varinames))
+  }
   names(result)<-varinames
   return(result)
 }
