@@ -15,11 +15,11 @@ correxp<-function(data,bexp,cexp,exp.status=1,varinames=NULL,weightname=NULL,met
   
   exposed <- data[data[,bexp] == exp.status,]
   
+  if( nrow(exposed)>0) {
   if(is.null(weightname)==TRUE) {
     weightname<-"W"
     exposed$W<-1
   }
-  if( nrow(exposed)>0) {
   result<-mapply(FUN=wCorr::weightedCorr,x=data.frame(exposed[,cexp]),y=data.frame(exposed[,varinames]),weights=data.frame(exposed[,weightname]),method=method)
   }
   else {
