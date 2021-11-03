@@ -8,13 +8,13 @@
 #' @param model.exponly a regression model object that is a generlized propensity score regression model fitted using only exposed units.
 #' @param exp.status the value indicating exposed units. Default is 1
 #' @param method a character string indicating the matching method used to conduct matching. Default is NULL. If NULL, only generalized propensity score is computed and matching is not done. Options include "nearest" (nearest neighbor matching) and "caliper" (caliper matching)
-#' @param caliper_bw a numeric vector indicating caliper bandwidth. Default is 0.2. If method is "nearest", this parameter is ignored.
+#' @param caliper_bw a numeric vector indicating caliper bandwidth. Default is 0.1. If method is "nearest", this parameter is ignored.
 #' @param replace an indicator of whether matching is done with replacement. Default is TRUE. If FALSE, matching is done without replacement. If FALSE, note that the output of this function may differ by the order of observation units in the original dataset.
 #' @export
 #' @examples 
 #' cgpsmatch()
 
-cgpsmatch<-function(data,bexp,cexp,ps,model.exponly,expstatus=1,method=NULL,caliper_bw=0.2,replace=TRUE) {
+cgpsmatch<-function(data,bexp,cexp,ps,model.exponly,expstatus=1,method=NULL,caliper_bw=0.1,replace=TRUE) {
   exponly <- data[data[,bexp]==expstatus,]
   unexponly <- data[data[,bexp] != expstatus,]
   
