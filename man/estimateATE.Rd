@@ -63,7 +63,7 @@ estimateATE(
 
 \item{family}{a character string indicating the error distribution and link function to be used in the disease model.}
 
-\item{bs.N}{a numeric vector indicating the number of bootstrapping samples}
+\item{bs.N}{a numeric vector indicating the number of bootstrapping samples. If bs.N=1, then bootstrapping is not used and bs.replace is ignored.}
 
 \item{bs.replace}{a character string indicating whether bootstrapping is done with replacement. Default is TRUE.}
 
