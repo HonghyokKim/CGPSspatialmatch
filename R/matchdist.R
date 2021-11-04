@@ -3,8 +3,8 @@
 #' This function matches exposed units and unexposed units by a pre-specified buffer distance (Euclidean distance)
 #' @param data a dataset object.
 #' @param bexp a character string indicating the name of the binary exposure. Use apostrophe like "VariableName"
-#' @param x a character string indicating the name of the longitude variable of observation units
-#' @param y a character string indicating the name of the latitude variable of observation units
+#' @param long a character string indicating the name of the longitude variable of observation units
+#' @param lat a character string indicating the name of the latitude variable of observation units
 #' @param exp.status a numeric vector indicating the value indicating exposed units. Defalut=1
 #' @param distbuf a numeric vector indicating the buffer distance by which exposed units and unexposed units are matched
 #' @param exp.included an indicator of whether exposed units are matched with not only unexposed units but also other exposed units. Defalut is TRUE. If FALSE, exposed units are matched with only unexposed units. See details
@@ -13,10 +13,10 @@
 #' @examples 
 #' matchdist()
 
-matchdist<-function(data,bexp,x,y,exp.status=1,distbuf=0.1,exp.included=TRUE,replace=TRUE) {
+matchdist<-function(data,bexp,long,lat,exp.status=1,distbuf=0.1,exp.included=TRUE,replace=TRUE) {
   start.time<-Sys.time()
-  long<-x
-  lat<-y
+  x <- eval(as.name(long))
+  y <- eval(as.name(lat))
   NUM_EXP <- sum(data[,bexp]==exp.status)
   data[,paste0(bexp,"2")] <- data[,bexp]
   data[,paste0(bexp,"2")][data[,paste0(bexp,"2")]==exp.status] <-seq(NUM_EXP)
