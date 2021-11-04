@@ -15,8 +15,6 @@
 
 matchdist<-function(data,bexp,long,lat,exp.status=1,distbuf=0.1,exp.included=TRUE,replace=TRUE) {
   start.time<-Sys.time()
-  x <- eval(as.name(long))
-  y <- eval(as.name(lat))
   NUM_EXP <- sum(data[,bexp]==exp.status)
   data[,paste0(bexp,"2")] <- data[,bexp]
   data[,paste0(bexp,"2")][data[,paste0(bexp,"2")]==exp.status] <-seq(NUM_EXP)
@@ -40,8 +38,8 @@ matchdist<-function(data,bexp,long,lat,exp.status=1,distbuf=0.1,exp.included=TRU
     # dist.mat<-as.matrix(dist(cbind(match.sample[,long], match.sample[,lat])))
     # diag(dist.mat)<-NA
     # dist.mat<-dist.mat[1,]
-    dist.mat <- match.sample %>% mutate(diff=sqrt( (first(x,default=first(x))-x)^2 
-                                                   +(first(y,default=first(y))-y)^2)
+    dist.mat <- match.sample %>% mutate(diff=sqrt( (first(eval(as.name(long)),default=first(eval(as.name(long))))-eval(as.name(long)))^2 
+                                                   +(first(eval(as.name(lat)),default=first(eval(as.name(lat))))-eval(as.name(lat)))^2)
     )
     dist.mat<-dist.mat$diff
     dist.mat[1]<-NA
