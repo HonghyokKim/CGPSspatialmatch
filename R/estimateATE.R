@@ -18,7 +18,7 @@
 #' @param smethod.replace an indicator of whether matching by GPS is done with replacement. Default is TRUE. If FALSE, matching is done without replacement. If FALSE, note that the output of this function may differ by the order of observation units in the original dataset.
 #' @param formulaDisease a character string indicating the formula of the disease model.
 #' @param family a character string indicating the error distribution and link function to be used in the disease model.
-#' @param bs.N a numeric vector indicating the number of bootstrapping samples
+#' @param bs.N a numeric vector indicating the number of bootstrapping samples. If bs.N=1, then bootstrapping is not used and bs.replace is ignored.
 #' @param bs.replace a character string indicating whether bootstrapping is done with replacement. Default is TRUE.
 #' @param varilist a character vector indicating variable names for which you wish to compute standardized mean difference. List variable names as a vector like c("VariableA","VariableB")
 #' @param corrmethod a character string indicating which correlation coefficient is to be computed. These include "Pearson" (default), "Spearman", "Polychoric", or "Polyserial". For tetrachoric use "Polychoric" and for biserial use "Polyserial". This relies on wCorr::weightedCorr
@@ -37,11 +37,16 @@ estimateATE<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbu
   PSerror<-0
   CGPSerror<-0
   
+  if(bs.N>1) {
   bootsp<-replicate(bs.N,dplyr::sample_n(dataset,nrow(dataset),replace=bs.replace),simplify=FALSE)
+  }
+  if(bs.N==1) {
+    bootsp<-dataset
+  }
   message(">>>>>>>>STEP 1: Matching by distance initiated")
   bootsp.m <- lapply(bootsp, 
                      function(data){
-                       CGPSspatialmatch::matchdist(data,bexp,x=long,y=lat,exp.status=exp.status,distbuf=distbuf,exp.included=exp.included,replace=fmethod.replace)$matched.dataset
+                       CGPSspatialmatch::matchdist(data,bexp,long=long,lat=lat,exp.status=exp.status,distbuf=distbuf,exp.included=exp.included,replace=fmethod.replace)$matched.dataset
                      })
   message(">>>>>>>>STEP 1: Matching by distance sucessfully done")
   
