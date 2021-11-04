@@ -7,8 +7,8 @@
 matchdist(
   data,
   bexp,
-  x,
-  y,
+  long,
+  lat,
   exp.status = 1,
   distbuf = 0.1,
   exp.included = TRUE,
@@ -20,9 +20,9 @@ matchdist(
 
 \item{bexp}{a character string indicating the name of the binary exposure. Use apostrophe like "VariableName"}
 
-\item{x}{a character string indicating the name of the longitude variable of observation units}
+\item{long}{a character string indicating the name of the longitude variable of observation units}
 
-\item{y}{a character string indicating the name of the latitude variable of observation units}
+\item{lat}{a character string indicating the name of the latitude variable of observation units}
 
 \item{exp.status}{a numeric vector indicating the value indicating exposed units. Defalut=1}
 
