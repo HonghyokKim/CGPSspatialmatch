@@ -55,9 +55,9 @@ estimateATE<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbu
 
       f1 <- as.formula(
         paste(formulaPS))
-      PSmodel<-eval(bquote(mgcv::gam(.(f1), data=data, family="binomial")))
+      PSmodel<-eval(bquote(mgcv::gam(.(f1), data=dataset, family="binomial")))
       PS.m<-lapply(bootsp.m,function(data){
-        data$PS<-predict(PSmodel,newdata=bootsp.m,type="response")
+        data$PS<-predict(PSmodel,newdata=data,type="response")
         data
       })
     
