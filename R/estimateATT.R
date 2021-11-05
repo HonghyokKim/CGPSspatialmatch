@@ -10,16 +10,24 @@
 #' @param exp.included an indicator of whether exposed units are matched with not only unexposed units but also other exposed units. Defalut is TRUE. If FALSE, exposed units are matched with only unexposed units. See details
 #' @param long a character string indicating the name of the longitude variable of observation units
 #' @param lat a character string indicating the name of the latitude variable of observation units
-#' @param formulaPS a character string indicating the formula of propensity score estimation. For PSmethod="mgcv.GAM", this string must be like "the binary exposure variable ~ variableA+variableB+variableC+s(long,lat)". For PSmethod="xgboost", this must be a vector like c(variableA, variableB, variableC)
-#' @param PSmethod a character string or a vector of variable names, indicating the method of propensity score estimation. Options include "mgcv.GAM" and "xgboost". Default is "mgcv.GAM"
-#' @param max_depth (xgboost only) a numeric vector indicating maximum depth of a tree. Default is 5
-#' @param eta (xgboost only) a numeric vector indicating the learning rate. Default is 0.1
-#' @param verbose (xgboost only) a numeric vector indicating whether xgboost will stay silent. Default is 0 (silent). If 1, it will print information about performance
-#' @param nthread (xgboost only) a numeric vector indicating the number of thread. See xgb.train
-#' @param eval_metric (xgboost only) a character string indicating evaluation metrics for validation data. Default is "auc". See xgb.train
-#' @param objective (xgboost only) a character string indicating the objective function. Default is "binary:logistic". See xgb.train
-#' @param nrounds (xgboost only) a numeric vector indicating the number of rounds. Default is 50. See xgb.train.
-#' @param formulaCGPS a character string indicating the formula of generalized propensity score estimation
+#' @param PS.method a character string or a vector of variable names, indicating the method of propensity score estimation. Options include "mgcv.GAM" and "xgboost". Default is "mgcv.GAM"
+#' @param PS.formula a character string indicating the formula of propensity score estimation. For PSmethod="mgcv.GAM", this string must be like "the binary exposure variable ~ variableA+variableB+variableC+s(long,lat)". For PSmethod="xgboost", this must be a vector like c("variableA", "variableB", "variableC", "long", "lat")
+#' @param PS.max_depth (xgboost only) a numeric vector indicating maximum depth of a tree. Default is 5
+#' @param PS.eta (xgboost only) a numeric vector indicating the learning rate. Default is 0.1
+#' @param PS.verbose (xgboost only) a numeric vector indicating whether xgboost will stay silent. Default is 0 (silent). If 1, it will print information about performance
+#' @param PS.nthread (xgboost only) a numeric vector indicating the number of thread. See xgb.train
+#' @param PS.eval_metric (xgboost only) a character string indicating evaluation metrics for validation data. Default is "auc". See xgb.train
+#' @param PS.objective (xgboost only) a character string indicating the objective function. Default is "binary:logistic". See xgb.train
+#' @param PS.nrounds (xgboost only) a numeric vector indicating the number of rounds. Default is 50. See xgb.train.
+#' @param CGPS.method a character string or a vector of variable names, indicating the method of conditional propensity score estimation. Options include "mgcv.GAM" and "xgboost". Default is "mgcv.GAM"
+#' @param CGPS.formula a character string indicating the formula of conditional generalized propensity score estimation
+#' @param CGPS.max_depth (xgboost only) a numeric vector indicating maximum depth of a tree. Default is 5
+#' @param CGPS.eta (xgboost only) a numeric vector indicating the learning rate. Default is 0.1
+#' @param CGPS.verbose (xgboost only) a numeric vector indicating whether xgboost will stay silent. Default is 0 (silent). If 1, it will print information about performance
+#' @param CGPS.nthread (xgboost only) a numeric vector indicating the number of thread. See xgb.train
+#' @param CGPS.eval_metric (xgboost only) a character string indicating evaluation metrics for validation data. Default is "rmse". See xgb.train
+#' @param CGPS.objective (xgboost only) a character string indicating the objective function. Default is "reg:squarederror". See xgb.train
+#' @param CGPS.nrounds (xgboost only) a numeric vector indicating the number of rounds. Default is 50. See xgb.train.
 #' @param smethod method a character string indicating the matching method used to conduct matching by GPS. Default is "caliper". Options include "nearest" (nearest neighbor matching) and "caliper" (caliper matching)
 #' @param caliper_bw a numeric vector indicating caliper bandwidth. Default is 0.1. If method is "nearest", this parameter is ignored.
 #' @param smethod.replace an indicator of whether matching by GPS is done with replacement. Default is TRUE. If FALSE, matching is done without replacement. If FALSE, note that the output of this function may differ by the order of observation units in the original dataset.
@@ -35,9 +43,10 @@
 #' estimateATT()
 
 estimateATT<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbuf=0.1,exp.included=TRUE,long,lat,
-                     formulaPS,PSmethod="mgcv.GAM",
-                     max_depth=5, eta=0.1, verbose=0, nthread=3, eval_metric="auc", objective="binary:logistic", nrounds=50,
-                     formulaCGPS,                     
+                     PS.method="mgcv.GAM",PS.formula,
+                     PS.max_depth=5, PS.eta=0.1, PS.verbose=0, PS.nthread=3, PS.eval_metric="auc", PS.objective="binary:logistic", PS.nrounds=50,
+                     CGPS.method="mgcv.GAM",CGPS.formula,
+                     CGPS.max_depth=5, CGPS.eta=0.1, CGPS.verbose=0, CGPS.nthread=3, CGPS.eval_metric="rmse", CGPS.objective="reg:squarederror", CGPS.nrounds=50,
                      smethod="caliper",caliper_bw=0.1,smethod.replace=FALSE,weight.cutoff=10,
                      formulaDisease,family,
                      bs.N,bs.replace=TRUE,
@@ -62,10 +71,10 @@ estimateATT<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbu
   
   message(">>>>>>>>STEP 2: PS estimation initiated")
   
-  if(PSmethod=="mgcv.GAM") {
+  if(PS.method=="mgcv.GAM") {
   tryCatch(expr={
       f1 <- as.formula(
-        paste(formulaPS))
+        paste(PS.formula))
       PSmodel<-eval(bquote(mgcv::gam(.(f1), data=dataset, family="binomial")))
       PS.m<-lapply(bootsp.m,function(data){
         data$PS<-predict(PSmodel,newdata=data,type="response")
@@ -81,16 +90,16 @@ estimateATT<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbu
   )
   }
   
-  if(PSmethod=="xgboost") {
+  if(PS.method=="xgboost") {
   tryCatch(expr={
-    boost.fitdat<-data.matrix(dataset[,formulaPS])
+    boost.fitdat<-data.matrix(dataset[,PS.formula])
     boost.dat<-xgboost::xgb.DMatrix(boost.fitdat, label = dataset[,bexp])
-    param <- list(max_depth = max_depth, eta = eta, verbose = verbose, nthread = nthread,
-                  objective = objective, eval_metric = eval_metric)
-    PSmodel <- xgboost::xgb.train(param=param,boost.dat,nrounds=nrounds)
+    param <- list(max_depth = PS.max_depth, eta = PS.eta, verbose = PS.verbose, nthread = PS.nthread,
+                  objective = PS.objective, eval_metric = PS.eval_metric)
+    PSmodel <- xgboost::xgb.train(param=param,boost.dat,nrounds=PS.nrounds)
     
     pred.dat<-lapply(bootsp.m, function(data) {
-      data.matrix(data[,formulaPS])
+      data.matrix(data[,PS.formula])
     })
     
     PS.m<-mapply(data=bootsp.m,pred.dat=pred.dat,function(data,pred.dat){
@@ -112,19 +121,40 @@ estimateATT<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbu
   
   
   if(PSerror !=1) {
+    
+    if(CGPS.method=="mgcv.GAM") {
     f2 <- as.formula(
-      paste(formulaCGPS))
+      paste(CGPS.formula))
     tryCatch(expr={
       CGPS.model <- 
         eval(bquote(mgcv::gam(.(f2), data=dataset[dataset[,bexp]==1,])))
 
-      message(">>>>>>>>STEP 3: CGPS estimation sucessfully done")
+      message(">>>>>>>>STEP 3: CGPS estimation (GAM) sucessfully done")
       message(">>>>>>>>STEP 4: Matching by GPS initiated")
     }
     ,
-    error=function(e) {e;message("CGPS estimation failed: check the dataset and/or parameterization"); CGPSerror<<-1},
-    warning=function(w) {w;message("CGPS estimation may have failed: check the dataset and/or parameterization")}
+    error=function(e) {e;message("CGPS estimation (GAM) failed: check the dataset and/or parameterization"); CGPSerror<<-1},
+    warning=function(w) {w;message("CGPS estimation (GAM) may have failed: check the dataset and/or parameterization")}
     )
+    }
+    
+    if(CGPS.method=="xgboost") {
+
+      tryCatch(expr={
+        boost.fitdat<-data.matrix(dataset[dataset[,bexp]==1,CGPS.formula])
+        boost.dat<-xgboost::xgb.DMatrix(boost.fitdat, label = dataset[dataset[,bexp]==1,bexp])
+        param <- list(max_depth = CGPS.max_depth, eta = CGPS.eta, verbose = CGPS.verbose, nthread = CGPS.nthread,
+                      objective = CGPS.objective, eval_metric = CGPS.eval_metric)
+        CGPS.model <- xgboost::xgb.train(param=param,boost.dat,nrounds=CGPS.nrounds)
+ 
+        message(">>>>>>>>STEP 3: CGPS estimation (xgboost) sucessfully done")
+        message(">>>>>>>>STEP 4: Matching by GPS initiated")
+      }
+      ,
+      error=function(e) {e;message("CGPS estimation (xgboost) failed: check the dataset and/or parameterization"); CGPSerror<<-1},
+      warning=function(w) {w;message("CGPS estimation (xgboost) may have failed: check the dataset and/or parameterization")}
+      )
+    }
   }
   
   
