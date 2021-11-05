@@ -124,8 +124,8 @@ estimateATT<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbu
     
     smd.org<-CGPSspatialmatch::smd(dataset,bexp,exp.status=exp.status,varinames=varilist)
     correxp.org<-CGPSspatialmatch::correxp(dataset,bexp,cexp,exp.status=exp.status,varinames=varilist,method=corrmethod)
-    smd.m<-lapply(findat,function(data) {CGPSspatialmatch::smd(data,bexp,exp.status=exp.status,varinames=varilist)})
-    correxp.m<-lapply(findat,function(data) {CGPSspatialmatch::correxp(data,bexp,cexp,exp.status=exp.status,varinames=varilist,method=corrmethod)})
+    smd.m<-lapply(findat,function(data) {CGPSspatialmatch::smd(data,bexp,exp.status=exp.status,varinames=varilist,weightname="weight")})
+    correxp.m<-lapply(findat,function(data) {CGPSspatialmatch::correxp(data,bexp,cexp,exp.status=exp.status,varinames=varilist,method=corrmethod,weightname="weight")})
     smd.m<-do.call("rbind",smd.m)
     correxp.m<-do.call("rbind",correxp.m)
     

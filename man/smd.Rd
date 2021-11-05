@@ -4,7 +4,7 @@
 \alias{smd}
 \title{smd function}
 \usage{
-smd(data, bexp, exp.status = 1, varinames = NULL)
+smd(data, bexp, exp.status = 1, varinames = NULL, weightname = NULL)
 }
 \arguments{
 \item{data}{a dataset object.}
@@ -14,6 +14,8 @@ smd(data, bexp, exp.status = 1, varinames = NULL)
 \item{exp.status}{a numeric vector indicating the value indicating exposed units. Defalut=1}
 
 \item{varinames}{a character vector indicating variable names for which you wish to compute standardized mean difference. List variable names as a vector like c("VariableA","VariableB")}
+
+\item{weightname}{the name of the weight variable. This weight is calculated by cgps.match. See cgps.match function. If NULL, weight is not given (i.e., all observations are equally weighted)}
 }
 \description{
 This function calcualtes standardized mean difference in variable(s) in a matched dataset.
