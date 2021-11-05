@@ -42,9 +42,9 @@
 
 estimateATT<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbuf=0.1,exp.included=TRUE,long,lat,
                      PS.method="mgcv.GAM",PS.formula,
-                     PS.max_depth=5, PS.eta=0.1, PS.verbose=0, PS.nthread=3, PS.eval_metric="auc", PS.objective="binary:logistic", PS.nrounds=50,
+                     PS.max_depth=5, PS.eta=0.1, PS.nthread=3, PS.eval_metric="auc", PS.objective="binary:logistic", PS.nrounds=50,
                      CGPS.method="mgcv.GAM",CGPS.formula,
-                     CGPS.max_depth=5, CGPS.eta=0.1, CGPS.verbose=0, CGPS.nthread=3, CGPS.eval_metric="rmse", CGPS.objective="reg:squarederror", CGPS.nrounds=50,
+                     CGPS.max_depth=5, CGPS.eta=0.1, CGPS.nthread=3, CGPS.eval_metric="rmse", CGPS.objective="reg:squarederror", CGPS.nrounds=50,
                      smethod="caliper",caliper_bw=0.1,smethod.replace=FALSE,weight.cutoff=10,
                      formulaDisease,family,
                      bs.N,bs.replace=TRUE,
@@ -193,8 +193,8 @@ estimateATT<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbu
     
     smd.org<-CGPSspatialmatch::smd(dataset,bexp,exp.status=exp.status,varinames=varilist)
     correxp.org<-CGPSspatialmatch::correxp(dataset,bexp,cexp,exp.status=exp.status,varinames=varilist,method=corrmethod)
-    smd.m<-lapply(findat,function(data) {CGPSspatialmatch::smd(data,bexp,exp.status=exp.status,varinames=varilist,weightname="weight")})
-    correxp.m<-lapply(findat,function(data) {CGPSspatialmatch::correxp(data,bexp,cexp,exp.status=exp.status,varinames=varilist,method=corrmethod,weightname="weight")})
+    smd.m<-lapply(findat,function(data) {CGPSspatialmatch::smd(data,bexp,exp.status=exp.status,varinames=varilist)})
+    correxp.m<-lapply(findat,function(data) {CGPSspatialmatch::correxp(data,bexp,cexp,exp.status=exp.status,varinames=varilist,method=corrmethod)})
     smd.m<-do.call("rbind",smd.m)
     correxp.m<-do.call("rbind",correxp.m)
     
