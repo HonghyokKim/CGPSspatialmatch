@@ -71,8 +71,6 @@ estimateATT(
 
 \item{PS.eta}{(xgboost only) a numeric vector indicating the learning rate. Default is 0.1}
 
-\item{PS.verbose}{(xgboost only) a numeric vector indicating whether xgboost will stay silent. Default is 0 (silent). If 1, it will print information about performance}
-
 \item{PS.nthread}{(xgboost only) a numeric vector indicating the number of thread. See xgb.train}
 
 \item{PS.eval_metric}{(xgboost only) a character string indicating evaluation metrics for validation data. Default is "auc". See xgb.train}
@@ -88,8 +86,6 @@ estimateATT(
 \item{CGPS.max_depth}{(xgboost only) a numeric vector indicating maximum depth of a tree. Default is 5}
 
 \item{CGPS.eta}{(xgboost only) a numeric vector indicating the learning rate. Default is 0.1}
-
-\item{CGPS.verbose}{(xgboost only) a numeric vector indicating whether xgboost will stay silent. Default is 0 (silent). If 1, it will print information about performance}
 
 \item{CGPS.nthread}{(xgboost only) a numeric vector indicating the number of thread. See xgb.train}
 
