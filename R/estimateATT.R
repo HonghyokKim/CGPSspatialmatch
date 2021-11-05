@@ -204,8 +204,8 @@ estimateATT<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbu
     end.time<-Sys.time()
     print(paste0("Elapsed time: ",round(end.time-start.time,3),attr(end.time-start.time,"units")))
     return(list(summary.empirical=result,summary=result2,distribution=coefest,
-                smd.org=smd.org,smd.matched=colMeans(smd.m),
-                correxp.org=correxp.org,correxp.matched=colMeans(correxp.m),
+                smd.org=smd.org,smd.matched=colMeans(smd.m,na.rm=T),
+                correxp.org=correxp.org,correxp.matched=colMeans(correxp.m,na.rm=T),
                 smd.matched.bs=smd.m,correxp.matched.bs=correxp.m))
   }
 }
