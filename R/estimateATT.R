@@ -14,7 +14,6 @@
 #' @param PS.formula a character string indicating the formula of propensity score estimation. For PSmethod="mgcv.GAM", this string must be like "the binary exposure variable ~ variableA+variableB+variableC+s(long,lat)". For PSmethod="xgboost", this must be a vector like c("variableA", "variableB", "variableC", "long", "lat")
 #' @param PS.max_depth (xgboost only) a numeric vector indicating maximum depth of a tree. Default is 5
 #' @param PS.eta (xgboost only) a numeric vector indicating the learning rate. Default is 0.1
-#' @param PS.verbose (xgboost only) a numeric vector indicating whether xgboost will stay silent. Default is 0 (silent). If 1, it will print information about performance
 #' @param PS.nthread (xgboost only) a numeric vector indicating the number of thread. See xgb.train
 #' @param PS.eval_metric (xgboost only) a character string indicating evaluation metrics for validation data. Default is "auc". See xgb.train
 #' @param PS.objective (xgboost only) a character string indicating the objective function. Default is "binary:logistic". See xgb.train
@@ -23,7 +22,6 @@
 #' @param CGPS.formula a character string indicating the formula of conditional generalized propensity score estimation
 #' @param CGPS.max_depth (xgboost only) a numeric vector indicating maximum depth of a tree. Default is 5
 #' @param CGPS.eta (xgboost only) a numeric vector indicating the learning rate. Default is 0.1
-#' @param CGPS.verbose (xgboost only) a numeric vector indicating whether xgboost will stay silent. Default is 0 (silent). If 1, it will print information about performance
 #' @param CGPS.nthread (xgboost only) a numeric vector indicating the number of thread. See xgb.train
 #' @param CGPS.eval_metric (xgboost only) a character string indicating evaluation metrics for validation data. Default is "rmse". See xgb.train
 #' @param CGPS.objective (xgboost only) a character string indicating the objective function. Default is "reg:squarederror". See xgb.train
@@ -94,7 +92,7 @@ estimateATT<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbu
   tryCatch(expr={
     boost.fitdat<-data.matrix(dataset[,PS.formula])
     boost.dat<-xgboost::xgb.DMatrix(boost.fitdat, label = dataset[,bexp])
-    param <- list(max_depth = PS.max_depth, eta = PS.eta, verbose = PS.verbose, nthread = PS.nthread,
+    param <- list(max_depth = PS.max_depth, eta = PS.eta, nthread = PS.nthread,
                   objective = PS.objective, eval_metric = PS.eval_metric)
     PSmodel <- xgboost::xgb.train(param=param,boost.dat,nrounds=PS.nrounds)
     
@@ -143,7 +141,7 @@ estimateATT<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbu
       tryCatch(expr={
         boost.fitdat<-data.matrix(dataset[dataset[,bexp]==1,CGPS.formula])
         boost.dat<-xgboost::xgb.DMatrix(boost.fitdat, label = dataset[dataset[,bexp]==1,bexp])
-        param <- list(max_depth = CGPS.max_depth, eta = CGPS.eta, verbose = CGPS.verbose, nthread = CGPS.nthread,
+        param <- list(max_depth = CGPS.max_depth, eta = CGPS.eta, nthread = CGPS.nthread,
                       objective = CGPS.objective, eval_metric = CGPS.eval_metric)
         CGPS.model <- xgboost::xgb.train(param=param,boost.dat,nrounds=CGPS.nrounds)
  
