@@ -15,6 +15,14 @@ estimateATT(
   long,
   lat,
   formulaPS,
+  PSmethod = "mgcv.GAM",
+  max_depth = 5,
+  eta = 0.1,
+  verbose = 0,
+  nthread = 3,
+  eval_metric = "auc",
+  objective = "binary:logistic",
+  nrounds = 50,
   formulaCGPS,
   smethod = "caliper",
   caliper_bw = 0.1,
@@ -47,7 +55,23 @@ estimateATT(
 
 \item{lat}{a character string indicating the name of the latitude variable of observation units}
 
-\item{formulaPS}{a character string indicating the formula of propensity score estimation. "the binary exposure variable ~ variableA+variableB+variableC+s(long,lat)"}
+\item{formulaPS}{a character string indicating the formula of propensity score estimation. For PSmethod="mgcv.GAM", this string must be like "the binary exposure variable ~ variableA+variableB+variableC+s(long,lat)". For PSmethod="xgboost", this must be a vector like c(variableA, variableB, variableC)}
+
+\item{PSmethod}{a character string or a vector of variable names, indicating the method of propensity score estimation. Options include "mgcv.GAM" and "xgboost". Default is "mgcv.GAM"}
+
+\item{max_depth}{(xgboost only) a numeric vector indicating maximum depth of a tree. Default is 5}
+
+\item{eta}{(xgboost only) a numeric vector indicating the learning rate. Default is 0.1}
+
+\item{verbose}{(xgboost only) a numeric vector indicating whether xgboost will stay silent. Default is 0 (silent). If 1, it will print information about performance}
+
+\item{nthread}{(xgboost only) a numeric vector indicating the number of thread. See xgb.train}
+
+\item{eval_metric}{(xgboost only) a character string indicating evaluation metrics for validation data. Default is "auc". See xgb.train}
+
+\item{objective}{(xgboost only) a character string indicating the objective function. Default is "binary:logistic". See xgb.train}
+
+\item{nrounds}{(xgboost only) a numeric vector indicating the number of rounds. Default is 50. See xgb.train.}
 
 \item{formulaCGPS}{a character string indicating the formula of generalized propensity score estimation}
 
