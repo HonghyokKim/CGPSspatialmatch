@@ -1,6 +1,6 @@
 export("%!in%")
 export(cgpsmatch)
 export(correxp)
-export(estimateATE)
+export(estimateATT)
 export(matchdist)
 export(smd)
