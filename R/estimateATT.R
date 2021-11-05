@@ -94,7 +94,7 @@ estimateATT<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbu
     findat<-lapply(PS.m,
                    function(data) {
                      CGPSspatialmatch::cgpsmatch(data,bexp,cexp,"PS",CGPS.model,expstatus=exp.status,method=smethod,caliper_bw=caliper_bw,replace=smethod.replace)
-                   },SIMPLIFY=FALSE)
+                   })
     message(">>>>>>>>STEP 4: Matching by GPS successfully done")
     message(">>>>>>>>STEP 5: Disease model estimation initiated")
     
