@@ -11,7 +11,6 @@
 #' @param long a character string indicating the name of the longitude variable of observation units
 #' @param lat a character string indicating the name of the latitude variable of observation units
 #' @param formulaPS a character string indicating the formula of propensity score estimation. "the binary exposure variable ~ variableA+variableB+variableC+s(long,lat)"
-#' @param PSmethod a character string indicating which method is used to estimate propensity score. Default is "mgcv.GAM.strata". Options also include "mgcv.GAM", "gnm.GNM". If "mgcv.GAM.strata" is used, a generalized additive model in mgcv package is used. Dummy variables indicating the stratum of matched exposed and unexposed units is included in the model. If "mgcv.GAM" is used, a generalized additive model is used but the dummy variables are not included. If "gnm.GNM" is used, the dummy variables are considered using a generalized non-linear model in gnm package, which is computationally more efficient. However, this does not allow for smoothing terms that can be used in generalized additive models in mgcv package.   
 #' @param formulaCGPS a character string indicating the formula of generalized propensity score estimation
 #' @param smethod method a character string indicating the matching method used to conduct matching by GPS. Default is "caliper". Options include "nearest" (nearest neighbor matching) and "caliper" (caliper matching)
 #' @param caliper_bw a numeric vector indicating caliper bandwidth. Default is 0.1. If method is "nearest", this parameter is ignored.
@@ -27,7 +26,7 @@
 #' estimateATE()
 
 estimateATE<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbuf=0.1,exp.included=TRUE,long,lat,
-                     formulaPS,PSmethod="mgcv.GAM.strata",
+                     formulaPS,
                      formulaCGPS,                     
                      smethod="caliper",caliper_bw=0.1,smethod.replace=FALSE,
                      formulaDisease,family,
@@ -41,7 +40,7 @@ estimateATE<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbu
   bootsp<-replicate(bs.N,dplyr::sample_n(dataset,nrow(dataset),replace=bs.replace),simplify=FALSE)
   }
   if(bs.N==1) {
-    bootsp<-dataset
+    bootsp<-list(dataset)
   }
   message(">>>>>>>>STEP 1: Matching by distance initiated")
   bootsp.m <- lapply(bootsp, 
@@ -53,31 +52,15 @@ estimateATE<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbu
   
   message(">>>>>>>>STEP 2: PS estimation initiated")
   tryCatch(expr={
-    if(PSmethod=="mgcv.GAM.strata") {
-      f1 <- as.formula(
-        paste(formulaPS,"+as.factor(strata_matchdist)"))
-      PS.m<-lapply(bootsp.m,function(data){
-        data$PS<-predict(eval(bquote(mgcv::gam(.(f1), data=data, family="binomial"))),type="response")
-        data
-      })
-    }
-    if(PSmethod=="mgcv.GAM") {
+
       f1 <- as.formula(
         paste(formulaPS))
+      PSmodel<-eval(bquote(mgcv::gam(.(f1), data=data, family="binomial")))
       PS.m<-lapply(bootsp.m,function(data){
-        data$PS<-predict(eval(bquote(mgcv::gam(.(f1), data=data, family="binomial"))),type="response")
+        data$PS<-predict(PSmodel,newdata=bootsp.m,type="response")
         data
       })
-    }
     
-    if(PSmethod=="gnm.GNM.strata") {
-      PS.m<-lapply(bootsp.m,function(data){
-        f1 <- as.formula(
-          paste(formulaPS))
-        data$PS<-predict(eval(bquote(gnm::gnm(.(f1), data=data, eliminate=as.factor(strata_matchdist), family="binomial"))),type="response")
-        data
-      })
-    }
     message(">>>>>>>>STEP 2: PS estimation sucessfully done")
     message(">>>>>>>>STEP 3: CGPS estimation initiated")
   }
