@@ -14,16 +14,24 @@ estimateATT(
   exp.included = TRUE,
   long,
   lat,
-  formulaPS,
-  PSmethod = "mgcv.GAM",
-  max_depth = 5,
-  eta = 0.1,
-  verbose = 0,
-  nthread = 3,
-  eval_metric = "auc",
-  objective = "binary:logistic",
-  nrounds = 50,
-  formulaCGPS,
+  PS.method = "mgcv.GAM",
+  PS.formula,
+  PS.max_depth = 5,
+  PS.eta = 0.1,
+  PS.verbose = 0,
+  PS.nthread = 3,
+  PS.eval_metric = "auc",
+  PS.objective = "binary:logistic",
+  PS.nrounds = 50,
+  CGPS.method = "mgcv.GAM",
+  CGPS.formula,
+  CGPS.max_depth = 5,
+  CGPS.eta = 0.1,
+  CGPS.verbose = 0,
+  CGPS.nthread = 3,
+  CGPS.eval_metric = "rmse",
+  CGPS.objective = "reg:squarederror",
+  CGPS.nrounds = 50,
   smethod = "caliper",
   caliper_bw = 0.1,
   smethod.replace = FALSE,
@@ -55,25 +63,41 @@ estimateATT(
 
 \item{lat}{a character string indicating the name of the latitude variable of observation units}
 
-\item{formulaPS}{a character string indicating the formula of propensity score estimation. For PSmethod="mgcv.GAM", this string must be like "the binary exposure variable ~ variableA+variableB+variableC+s(long,lat)". For PSmethod="xgboost", this must be a vector like c(variableA, variableB, variableC)}
+\item{PS.method}{a character string or a vector of variable names, indicating the method of propensity score estimation. Options include "mgcv.GAM" and "xgboost". Default is "mgcv.GAM"}
 
-\item{PSmethod}{a character string or a vector of variable names, indicating the method of propensity score estimation. Options include "mgcv.GAM" and "xgboost". Default is "mgcv.GAM"}
+\item{PS.formula}{a character string indicating the formula of propensity score estimation. For PSmethod="mgcv.GAM", this string must be like "the binary exposure variable ~ variableA+variableB+variableC+s(long,lat)". For PSmethod="xgboost", this must be a vector like c("variableA", "variableB", "variableC", "long", "lat")}
 
-\item{max_depth}{(xgboost only) a numeric vector indicating maximum depth of a tree. Default is 5}
+\item{PS.max_depth}{(xgboost only) a numeric vector indicating maximum depth of a tree. Default is 5}
 
-\item{eta}{(xgboost only) a numeric vector indicating the learning rate. Default is 0.1}
+\item{PS.eta}{(xgboost only) a numeric vector indicating the learning rate. Default is 0.1}
 
-\item{verbose}{(xgboost only) a numeric vector indicating whether xgboost will stay silent. Default is 0 (silent). If 1, it will print information about performance}
+\item{PS.verbose}{(xgboost only) a numeric vector indicating whether xgboost will stay silent. Default is 0 (silent). If 1, it will print information about performance}
 
-\item{nthread}{(xgboost only) a numeric vector indicating the number of thread. See xgb.train}
+\item{PS.nthread}{(xgboost only) a numeric vector indicating the number of thread. See xgb.train}
 
-\item{eval_metric}{(xgboost only) a character string indicating evaluation metrics for validation data. Default is "auc". See xgb.train}
+\item{PS.eval_metric}{(xgboost only) a character string indicating evaluation metrics for validation data. Default is "auc". See xgb.train}
 
-\item{objective}{(xgboost only) a character string indicating the objective function. Default is "binary:logistic". See xgb.train}
+\item{PS.objective}{(xgboost only) a character string indicating the objective function. Default is "binary:logistic". See xgb.train}
 
-\item{nrounds}{(xgboost only) a numeric vector indicating the number of rounds. Default is 50. See xgb.train.}
+\item{PS.nrounds}{(xgboost only) a numeric vector indicating the number of rounds. Default is 50. See xgb.train.}
 
-\item{formulaCGPS}{a character string indicating the formula of generalized propensity score estimation}
+\item{CGPS.method}{a character string or a vector of variable names, indicating the method of conditional propensity score estimation. Options include "mgcv.GAM" and "xgboost". Default is "mgcv.GAM"}
+
+\item{CGPS.formula}{a character string indicating the formula of conditional generalized propensity score estimation}
+
+\item{CGPS.max_depth}{(xgboost only) a numeric vector indicating maximum depth of a tree. Default is 5}
+
+\item{CGPS.eta}{(xgboost only) a numeric vector indicating the learning rate. Default is 0.1}
+
+\item{CGPS.verbose}{(xgboost only) a numeric vector indicating whether xgboost will stay silent. Default is 0 (silent). If 1, it will print information about performance}
+
+\item{CGPS.nthread}{(xgboost only) a numeric vector indicating the number of thread. See xgb.train}
+
+\item{CGPS.eval_metric}{(xgboost only) a character string indicating evaluation metrics for validation data. Default is "rmse". See xgb.train}
+
+\item{CGPS.objective}{(xgboost only) a character string indicating the objective function. Default is "reg:squarederror". See xgb.train}
+
+\item{CGPS.nrounds}{(xgboost only) a numeric vector indicating the number of rounds. Default is 50. See xgb.train.}
 
 \item{smethod}{method a character string indicating the matching method used to conduct matching by GPS. Default is "caliper". Options include "nearest" (nearest neighbor matching) and "caliper" (caliper matching)}
 
