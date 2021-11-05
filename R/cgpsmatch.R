@@ -34,6 +34,9 @@ cgpsmatch<-function(data,bexp,cexp,ps,model.exponly,expstatus=1,method=NULL,cali
   GPS_unexponly <- dnorm(cf_unexposed,mean=predict(model.exponly,newdata=unexponly.pred),sd=sqrt(mean( (predict(model.exponly,newdata=exponly.pred)-exponly[,cexp])^2 )))
   GPS_unexponly_Cstab <- dnorm(cf_unexposed,mean=mean(cf_unexposed,na.rm=T),sd=sd(cf_unexposed,na.rm=T))
   
+  exponly[,paste0(cexp,"_cf")]<- exponly[,cexp]
+  unexponly[,paste0(cexp,"_cf")]<- cf_unexposed
+  
   gpsname<-paste0(ps,"_GPS")
   exponly[,gpsname]<-exponly[,ps]*GPS_exponly
   unexponly[,gpsname]<-unexponly[,ps]*GPS_unexponly
