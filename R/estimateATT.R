@@ -1,4 +1,4 @@
-#' estimateATE function
+#' estimateATT function
 #'
 #' This function matches exposed units and unexposed units by a pre-specified buffer distance (Euclidean distance)
 #' @param dataset a dataset object.
@@ -23,9 +23,9 @@
 #' @param corrmethod a character string indicating which correlation coefficient is to be computed. These include "Pearson" (default), "Spearman", "Polychoric", or "Polyserial". For tetrachoric use "Polychoric" and for biserial use "Polyserial". This relies on wCorr::weightedCorr
 #' @export
 #' @examples 
-#' estimateATE()
+#' estimateATT()
 
-estimateATE<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbuf=0.1,exp.included=TRUE,long,lat,
+estimateATT<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbuf=0.1,exp.included=TRUE,long,lat,
                      formulaPS,
                      formulaCGPS,                     
                      smethod="caliper",caliper_bw=0.1,smethod.replace=FALSE,
