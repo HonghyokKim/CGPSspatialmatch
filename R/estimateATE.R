@@ -65,8 +65,8 @@ estimateATE<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbu
     message(">>>>>>>>STEP 3: CGPS estimation initiated")
   }
   ,
-  error=function(e) {message("PS estimation failed: check the dataset and/or parameterization"); PSerror<<-1;CGPSerror<<-1},
-  warning=function(w) {}
+  error=function(e) {e;message("PS estimation failed: check the dataset and/or parameterization"); PSerror<<-1;CGPSerror<<-1},
+  warning=function(w) {w;message("PS estimation may have failed: check the dataset and/or parameterization")}
   )
   
   
@@ -83,8 +83,8 @@ estimateATE<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbu
       message(">>>>>>>>STEP 4: Matching by GPS initiated")
     }
     ,
-    error=function(e) {message("CGPS estimation failed: check the dataset and/or parameterization"); CGPSerror<<-1},
-    warning=function(w) {}
+    error=function(e) {e;message("CGPS estimation failed: check the dataset and/or parameterization"); CGPSerror<<-1},
+    warning=function(w) {w;message("CGPS estimation may have failed: check the dataset and/or parameterization")}
     )
   }
   
@@ -108,8 +108,8 @@ estimateATE<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbu
       message(">>ATE has been successfully estimated by CGPS spatial matching procedure with bootstrapping. Check the distribution of bootstrapped estimates")
     }
     ,
-    error=function(e) {message("Disease model estimation failed: check the dataset and/or parameterization")},
-    warning=function(w) {}
+    error=function(e) {e;message("Disease model estimation failed: check the dataset and/or parameterization")},
+    warning=function(w) {w;message("Disease model estimation may have failed: check the dataset and/or parameterization")}
     )
     
     coefest<-sapply(modelfit,function(object){
