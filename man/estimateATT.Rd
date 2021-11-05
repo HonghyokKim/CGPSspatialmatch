@@ -19,6 +19,7 @@ estimateATT(
   smethod = "caliper",
   caliper_bw = 0.1,
   smethod.replace = FALSE,
+  weight.cutoff = 10,
   formulaDisease,
   family,
   bs.N,
@@ -55,6 +56,8 @@ estimateATT(
 \item{caliper_bw}{a numeric vector indicating caliper bandwidth. Default is 0.1. If method is "nearest", this parameter is ignored.}
 
 \item{smethod.replace}{an indicator of whether matching by GPS is done with replacement. Default is TRUE. If FALSE, matching is done without replacement. If FALSE, note that the output of this function may differ by the order of observation units in the original dataset.}
+
+\item{weight.cutoff}{a numeric vector indicating the cutoff value of the weight. Default is 10.}
 
 \item{formulaDisease}{a character string indicating the formula of the disease model.}
 

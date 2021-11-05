@@ -10,11 +10,12 @@
 #' @param method a character string indicating the matching method used to conduct matching. Default is NULL. If NULL, only generalized propensity score is computed and matching is not done. Options include "nearest" (nearest neighbor matching) and "caliper" (caliper matching)
 #' @param caliper_bw a numeric vector indicating caliper bandwidth. Default is 0.1. If method is "nearest", this parameter is ignored.
 #' @param replace an indicator of whether matching is done with replacement. Default is TRUE. If FALSE, matching is done without replacement. If FALSE, note that the output of this function may differ by the order of observation units in the original dataset.
+#' @param weight.cutoff a numeric vector indicating the cutoff value of the weight. Default is 10.
 #' @export
 #' @examples 
 #' cgpsmatch()
 
-cgpsmatch<-function(data,bexp,cexp,ps,model.exponly,expstatus=1,method=NULL,caliper_bw=0.1,replace=TRUE) {
+cgpsmatch<-function(data,bexp,cexp,ps,model.exponly,expstatus=1,method=NULL,caliper_bw=0.1,replace=TRUE,weight.cutoff=10) {
   exponly <- data[data[,bexp]==expstatus,]
   unexponly <- data[data[,bexp] != expstatus,]
   
@@ -33,6 +34,9 @@ cgpsmatch<-function(data,bexp,cexp,ps,model.exponly,expstatus=1,method=NULL,cali
   
   exponly$weight<-  (1/exponly[,gpsname])*GPS_exponly_Cstab*GPS_exponly_Bstab
   unexponly$weight<-  (1/unexponly[,gpsname])*GPS_unexponly_Cstab*GPS_unexponly_Bstab
+  
+  exponly$weight <- ifelse(exponly$weight>weight.cutoff,weight.cutoff,exponly$weight)
+  unexponly$weight <- ifelse(unexponly$weight>weight.cutoff,weight.cutoff,unexponly$weight)
   
   result<-rbind(exponly,unexponly)
   if(is.null(method)==FALSE) {

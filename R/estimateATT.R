@@ -15,6 +15,7 @@
 #' @param smethod method a character string indicating the matching method used to conduct matching by GPS. Default is "caliper". Options include "nearest" (nearest neighbor matching) and "caliper" (caliper matching)
 #' @param caliper_bw a numeric vector indicating caliper bandwidth. Default is 0.1. If method is "nearest", this parameter is ignored.
 #' @param smethod.replace an indicator of whether matching by GPS is done with replacement. Default is TRUE. If FALSE, matching is done without replacement. If FALSE, note that the output of this function may differ by the order of observation units in the original dataset.
+#' @param weight.cutoff a numeric vector indicating the cutoff value of the weight. Default is 10.
 #' @param formulaDisease a character string indicating the formula of the disease model.
 #' @param family a character string indicating the error distribution and link function to be used in the disease model.
 #' @param bs.N a numeric vector indicating the number of bootstrapping samples. If bs.N=1, then bootstrapping is not used and bs.replace is ignored.
@@ -28,7 +29,7 @@
 estimateATT<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbuf=0.1,exp.included=TRUE,long,lat,
                      formulaPS,
                      formulaCGPS,                     
-                     smethod="caliper",caliper_bw=0.1,smethod.replace=FALSE,
+                     smethod="caliper",caliper_bw=0.1,smethod.replace=FALSE,weight.cutoff=10,
                      formulaDisease,family,
                      bs.N,bs.replace=TRUE,
                      varilist,corrmethod="Pearson") {
@@ -93,7 +94,7 @@ estimateATT<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbu
     
     findat<-lapply(PS.m,
                    function(data) {
-                     CGPSspatialmatch::cgpsmatch(data,bexp,cexp,"PS",CGPS.model,expstatus=exp.status,method=smethod,caliper_bw=caliper_bw,replace=smethod.replace)
+                     CGPSspatialmatch::cgpsmatch(data,bexp,cexp,"PS",CGPS.model,expstatus=exp.status,method=smethod,caliper_bw=caliper_bw,replace=smethod.replace,weight.cutoff=weight.cutoff)
                    })
     message(">>>>>>>>STEP 4: Matching by GPS successfully done")
     message(">>>>>>>>STEP 5: Disease model estimation initiated")
