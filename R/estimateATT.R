@@ -25,7 +25,6 @@
 #' @param PS.cv.eta (xgboost.cv only) a numeric vector indicating the learning rate. Default=0.1.
 #' @param PS.cv.nthread (xgboost.cv only) a numeric vector indicating the number of thread. Default=1. See xgb.train
 #' @param PS.cv.subsample (xgboost.cv only) a numeric vector indicating subsample ratio of the training instance. Default=0.5. See xgb.train
-#' @param PS.cv.gamma (xgboost.cv only) a numeric vector indicating minimum loss reduction required to make a further partition on a leaf node of the tree. Default=0.1. See xgb.train
 #' @param PS.cv.eval_metric (xgboost.cv only) a character string indicating evaluation metrics for validation data. Default="auc". See xgb.train
 #' @param PS.cv.colsample_bytree (xgboost.cv only) a numeric vector indicating subsample ratio of columns when constructing each tree. Default=1. See. xgb.train
 #' @param PS.cv.min_child_weight (xgboost.cv only) Default=1. See. xgb.train
@@ -46,7 +45,6 @@
 #' @param CGPS.cv.eta (xgboost.cv only) a numeric vector indicating the learning rate. Default=0.1.
 #' @param CGPS.cv.nthread (xgboost.cv only) a numeric vector indicating the number of thread. Default=1. See xgb.train
 #' @param CGPS.cv.subsample (xgboost.cv only) a numeric vector indicating subsample ratio of the training instance. Default=0.5. See xgb.train
-#' @param CGPS.cv.gamma (xgboost.cv only) a numeric vector indicating minimum loss reduction required to make a further partition on a leaf node of the tree. Default=0.1. See xgb.train
 #' @param CGPS.cv.eval_metric (xgboost.cv only) a character string indicating evaluation metrics for validation data. Default="auc". See xgb.train
 #' @param CGPS.cv.colsample_bytree (xgboost.cv only) a numeric vector indicating subsample ratio of columns when constructing each tree. Default=1. See. xgb.train
 #' @param CGPS.cv.min_child_weight (xgboost.cv only) Default=1. See. xgb.train

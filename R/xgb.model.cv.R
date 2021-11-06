@@ -3,7 +3,7 @@
 #' This internal function explores optimal parameters in xgb.train using cross-validation
 #' xgb.model.cv()
 
-xgb.model.cv<-function(data,cv.objective,cv.nround=1000,cv.nfold=10,cv.max_depth=5,cv.eta=0.1,cv.nthread=1,cv.subsample=0.5,cv.gamma=0.1,cv.eval_metric,cv.colsample_bytree=1,cv.min_child_weight=1,early_stopping_rounds=10,cv.local.N=100) {
+xgb.model.cv<-function(data,cv.objective,cv.nround=10000,cv.nfold=5,cv.max_depth=5,cv.eta=0.1,cv.nthread=1,cv.subsample=0.5,cv.gamma=0.1,cv.eval_metric,cv.colsample_bytree=1,cv.min_child_weight=1,early_stopping_rounds=50,cv.local.N=100) {
 
 best.seedn = NA
 best.param = list()
@@ -17,7 +17,6 @@ for (aaaa in 1:cv.local.N) {
                 eta = cv.eta,
                 nthread=cv.nthread,
                 subsample=cv.subsample,
-                gamma=cv.gamma,
                 eval_metric=cv.eval_metric,
                 colsample_bytree = cv.colsample_bytree, 
                 min_child_weight = cv.min_child_weight
