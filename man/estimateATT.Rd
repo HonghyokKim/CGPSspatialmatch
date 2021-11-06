@@ -18,20 +18,40 @@ estimateATT(
   PS.formula,
   PS.max_depth = 5,
   PS.eta = 0.1,
-  PS.verbose = 0,
-  PS.nthread = 3,
+  PS.nthread = 1,
   PS.eval_metric = "auc",
   PS.objective = "binary:logistic",
   PS.nrounds = 50,
+  PS.cv.objective = "binary:logistic",
+  PS.cv.max_depth = 5,
+  PS.cv.eta = 0.1,
+  PS.cv.nthread = 1,
+  PS.cv.subsample = 0.5,
+  PS.cv.gamma = 0.1,
+  PS.cv.eval_metric = "auc",
+  PS.cv.colsample_bytree = 1,
+  PS.cv.min_child_weight = 1,
+  PS.early_stopping_rounds = 10,
+  PS.cv.local.N = 100,
   CGPS.method = "mgcv.GAM",
   CGPS.formula,
   CGPS.max_depth = 5,
   CGPS.eta = 0.1,
-  CGPS.verbose = 0,
-  CGPS.nthread = 3,
+  CGPS.nthread = 1,
   CGPS.eval_metric = "rmse",
   CGPS.objective = "reg:squarederror",
   CGPS.nrounds = 50,
+  CGPS.cv.objective = "reg:squarederror",
+  CGPS.cv.max_depth = 5,
+  CGPS.cv.eta = 0.1,
+  CGPS.cv.nthread = 1,
+  CGPS.cv.subsample = 0.5,
+  CGPS.cv.gamma = 0.1,
+  CGPS.cv.eval_metric = "rmse",
+  CGPS.cv.colsample_bytree = 1,
+  CGPS.cv.min_child_weight = 1,
+  CGPS.early_stopping_rounds = 10,
+  CGPS.cv.local.N = 100,
   smethod = "caliper",
   caliper_bw = 0.1,
   smethod.replace = FALSE,
@@ -53,7 +73,7 @@ estimateATT(
 
 \item{cexp}{a character string indicating the name of the continuous exposure. Use apostrophe like "VariableName"}
 
-\item{fmethod.replace}{an indicator of whether matching by distance is done with replacement. Default is TRUE. If FALSE, matching is done without replacement. If FALSE, note that the output of this function may differ by the order of observation units in the original dataset.}
+\item{fmethod.replace}{an indicator of whether matching by distance is done with replacement. Default=TRUE. If FALSE, matching is done without replacement. If FALSE, note that the output of this function may differ by the order of observation units in the original dataset.}
 
 \item{distbuf}{a numeric vector indicating the buffer distance by which exposed units and unexposed units are matched}
 
@@ -63,45 +83,89 @@ estimateATT(
 
 \item{lat}{a character string indicating the name of the latitude variable of observation units}
 
-\item{PS.method}{a character string or a vector of variable names, indicating the method of propensity score estimation. Options include "mgcv.GAM" and "xgboost". Default is "mgcv.GAM"}
+\item{PS.method}{a character string or a vector of variable names, indicating the method of propensity score estimation. Options include "mgcv.GAM" (Generalized additive model in mgcv package), "xgboost" (extreme gradient boosting in xgboost package), and "xgboost.cv" (xgboost with cross-validation). Default="mgcv.GAM"}
 
 \item{PS.formula}{a character string indicating the formula of propensity score estimation. For PSmethod="mgcv.GAM", this string must be like "the binary exposure variable ~ variableA+variableB+variableC+s(long,lat)". For PSmethod="xgboost", this must be a vector like c("variableA", "variableB", "variableC", "long", "lat")}
 
-\item{PS.max_depth}{(xgboost only) a numeric vector indicating maximum depth of a tree. Default is 5}
+\item{PS.max_depth}{(xgboost only) a numeric vector indicating maximum depth of a tree. Default=5}
 
-\item{PS.eta}{(xgboost only) a numeric vector indicating the learning rate. Default is 0.1}
+\item{PS.eta}{(xgboost only) a numeric vector indicating the learning rate. Default=0.1}
 
-\item{PS.nthread}{(xgboost only) a numeric vector indicating the number of thread. See xgb.train}
+\item{PS.nthread}{(xgboost only) a numeric vector indicating the number of thread. Default=1. See xgb.train}
 
-\item{PS.eval_metric}{(xgboost only) a character string indicating evaluation metrics for validation data. Default is "auc". See xgb.train}
+\item{PS.eval_metric}{(xgboost only) a character string indicating evaluation metrics for validation data. Default="auc". See xgb.train}
 
-\item{PS.objective}{(xgboost only) a character string indicating the objective function. Default is "binary:logistic". See xgb.train}
+\item{PS.objective}{(xgboost only) a character string indicating the objective function. Default="binary:logistic". See xgb.train}
 
-\item{PS.nrounds}{(xgboost only) a numeric vector indicating the number of rounds. Default is 50. See xgb.train.}
+\item{PS.nrounds}{(xgboost only) a numeric vector indicating the number of rounds. Default=50. See xgb.train.}
 
-\item{CGPS.method}{a character string or a vector of variable names, indicating the method of conditional propensity score estimation. Options include "mgcv.GAM" and "xgboost". Default is "mgcv.GAM"}
+\item{PS.cv.objective}{(xgboost.cv only) a character string indicating the objective function. Default="binary:logistic" See xgb.train}
+
+\item{PS.cv.max_depth}{(xgboost.cv only) a numeric vector indicating maximum depth of a tree. Default=5.}
+
+\item{PS.cv.eta}{(xgboost.cv only) a numeric vector indicating the learning rate. Default=0.1.}
+
+\item{PS.cv.nthread}{(xgboost.cv only) a numeric vector indicating the number of thread. Default=1. See xgb.train}
+
+\item{PS.cv.subsample}{(xgboost.cv only) a numeric vector indicating subsample ratio of the training instance. Default=0.5. See xgb.train}
+
+\item{PS.cv.gamma}{(xgboost.cv only) a numeric vector indicating minimum loss reduction required to make a further partition on a leaf node of the tree. Default=0.1. See xgb.train}
+
+\item{PS.cv.eval_metric}{(xgboost.cv only) a character string indicating evaluation metrics for validation data. Default="auc". See xgb.train}
+
+\item{PS.cv.colsample_bytree}{(xgboost.cv only) a numeric vector indicating subsample ratio of columns when constructing each tree. Default=1. See. xgb.train}
+
+\item{PS.cv.min_child_weight}{(xgboost.cv only) Default=1. See. xgb.train}
+
+\item{PS.early_stopping_rounds}{(xgboost.cv only) a numeric vector indicating when xgboost stops. If the evaluation metric did not decrease until when (code)PS.early_stopping_rounds, xgboost stops. This saves time.}
+
+\item{PS.cv.local.N}{(xgboost.cv only) a numeric vector indicating how many times xgboost will search (local) mini-ma of the evaluation metric function. Default=100}
+
+\item{CGPS.method}{a character string or a vector of variable names, indicating the method of conditional propensity score estimation. Options include "mgcv.GAM", "xgboost", and "xgboost.cv". Default="mgcv.GAM".}
 
 \item{CGPS.formula}{a character string indicating the formula of conditional generalized propensity score estimation}
 
-\item{CGPS.max_depth}{(xgboost only) a numeric vector indicating maximum depth of a tree. Default is 5}
+\item{CGPS.max_depth}{(xgboost only) a numeric vector indicating maximum depth of a tree. Default=5}
 
-\item{CGPS.eta}{(xgboost only) a numeric vector indicating the learning rate. Default is 0.1}
+\item{CGPS.eta}{(xgboost only) a numeric vector indicating the learning rate. Default=0.1}
 
-\item{CGPS.nthread}{(xgboost only) a numeric vector indicating the number of thread. See xgb.train}
+\item{CGPS.nthread}{(xgboost only) a numeric vector indicating the number of thread. Default=1. See xgb.train}
 
-\item{CGPS.eval_metric}{(xgboost only) a character string indicating evaluation metrics for validation data. Default is "rmse". See xgb.train}
+\item{CGPS.eval_metric}{(xgboost only) a character string indicating evaluation metrics for validation data. Default="rmse". See xgb.train}
 
-\item{CGPS.objective}{(xgboost only) a character string indicating the objective function. Default is "reg:squarederror". See xgb.train}
+\item{CGPS.objective}{(xgboost only) a character string indicating the objective function. Default="reg:squarederror". See xgb.train}
 
-\item{CGPS.nrounds}{(xgboost only) a numeric vector indicating the number of rounds. Default is 50. See xgb.train.}
+\item{CGPS.nrounds}{(xgboost only) a numeric vector indicating the number of rounds. Default=50. See xgb.train.}
 
-\item{smethod}{method a character string indicating the matching method used to conduct matching by GPS. Default is "caliper". Options include "nearest" (nearest neighbor matching) and "caliper" (caliper matching)}
+\item{CGPS.cv.objective}{(xgboost.cv only) a character string indicating the objective function. Default="binary:logistic" See xgb.train}
 
-\item{caliper_bw}{a numeric vector indicating caliper bandwidth. Default is 0.1. If method is "nearest", this parameter is ignored.}
+\item{CGPS.cv.max_depth}{(xgboost.cv only) a numeric vector indicating maximum depth of a tree. Default=5.}
 
-\item{smethod.replace}{an indicator of whether matching by GPS is done with replacement. Default is TRUE. If FALSE, matching is done without replacement. If FALSE, note that the output of this function may differ by the order of observation units in the original dataset.}
+\item{CGPS.cv.eta}{(xgboost.cv only) a numeric vector indicating the learning rate. Default=0.1.}
 
-\item{weight.cutoff}{a numeric vector indicating the cutoff value of the weight. Default is 10.}
+\item{CGPS.cv.nthread}{(xgboost.cv only) a numeric vector indicating the number of thread. Default=1. See xgb.train}
+
+\item{CGPS.cv.subsample}{(xgboost.cv only) a numeric vector indicating subsample ratio of the training instance. Default=0.5. See xgb.train}
+
+\item{CGPS.cv.gamma}{(xgboost.cv only) a numeric vector indicating minimum loss reduction required to make a further partition on a leaf node of the tree. Default=0.1. See xgb.train}
+
+\item{CGPS.cv.eval_metric}{(xgboost.cv only) a character string indicating evaluation metrics for validation data. Default="auc". See xgb.train}
+
+\item{CGPS.cv.colsample_bytree}{(xgboost.cv only) a numeric vector indicating subsample ratio of columns when constructing each tree. Default=1. See. xgb.train}
+
+\item{CGPS.cv.min_child_weight}{(xgboost.cv only) Default=1. See. xgb.train}
+
+\item{CGPS.early_stopping_rounds}{(xgboost.cv only) a numeric vector indicating when xgboost stoCGPS. If the evaluation metric did not decrease until when (code)CGPS.early_stopping_rounds, xgboost stoCGPS. This saves time.}
+
+\item{CGPS.cv.local.N}{(xgboost.cv only) a numeric vector indicating how many times xgboost will search (local) mini-ma of the evaluation metric function. Default=100}
+
+\item{smethod}{method a character string indicating the matching method used to conduct matching by GCGPS. Default="caliper". Options include "nearest" (nearest neighbor matching) and "caliper" (caliper matching)}
+
+\item{caliper_bw}{a numeric vector indicating caliper bandwidth. Default=0.1. If method is "nearest", this parameter is ignored.}
+
+\item{smethod.replace}{an indicator of whether matching by GPS is done with replacement. Default=TRUE. If FALSE, matching is done without replacement. If FALSE, note that the output of this function may differ by the order of observation units in the original dataset.}
+
+\item{weight.cutoff}{a numeric vector indicating the cutoff value of the weight. Default=10.}
 
 \item{formulaDisease}{a character string indicating the formula of the disease model.}
 
@@ -109,7 +173,7 @@ estimateATT(
 
 \item{bs.N}{a numeric vector indicating the number of bootstrapping samples. If bs.N=1, then bootstrapping is not used and bs.replace is ignored.}
 
-\item{bs.replace}{a character string indicating whether bootstrapping is done with replacement. Default is TRUE.}
+\item{bs.replace}{a character string indicating whether bootstrapping is done with replacement. Default=TRUE.}
 
 \item{varilist}{a character vector indicating variable names for which you wish to compute standardized mean difference. List variable names as a vector like c("VariableA","VariableB")}
 
