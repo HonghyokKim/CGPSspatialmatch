@@ -150,7 +150,7 @@ estimateATT<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbu
       boost.fitdat<-data.matrix(dataset[,PS.formula])
       boost.dat<-xgboost::xgb.DMatrix(boost.fitdat, label = dataset[,bexp])
       
-      PSmodel <- xgb.model.cv(data=boost.dat,cv.nround=PS.cv.nround,cv.nfold=PS.cv.nfold,cv.objective=PS.cv.objective,cv.objective=PS.cv.objective,cv.max_depth=PS.cv.max_depth,cv.eta=PS.cv.eta,cv.nthread=PS.cv.nthread,cv.subsample=PS.cv.subsample,cv.gamma=PS.cv.gamma,cv.eval_metric=PS.cv.eval_metric,cv.colsample_bytree=PS.cv.colsample_bytree,cv.min_child_weight=PS.cv.min_child_weight,early_stopping_rounds=PS.early_stopping_rounds,cv.local.N=PS.cv.local.N)
+      PSmodel <- xgb.model.cv(data=boost.dat,cv.nround=PS.cv.nround,cv.nfold=PS.cv.nfold,cv.objective=PS.cv.objective,cv.max_depth=PS.cv.max_depth,cv.eta=PS.cv.eta,cv.nthread=PS.cv.nthread,cv.subsample=PS.cv.subsample,cv.gamma=PS.cv.gamma,cv.eval_metric=PS.cv.eval_metric,cv.colsample_bytree=PS.cv.colsample_bytree,cv.min_child_weight=PS.cv.min_child_weight,early_stopping_rounds=PS.early_stopping_rounds,cv.local.N=PS.cv.local.N)
 
       pred.dat<-lapply(bootsp.m, function(data) {
         data.matrix(data[,PS.formula])
