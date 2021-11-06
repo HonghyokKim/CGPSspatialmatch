@@ -117,8 +117,6 @@ estimateATT(
 
 \item{PS.cv.subsample}{(xgboost.cv only) a numeric vector indicating subsample ratio of the training instance. Default=0.5. See xgb.train}
 
-\item{PS.cv.gamma}{(xgboost.cv only) a numeric vector indicating minimum loss reduction required to make a further partition on a leaf node of the tree. Default=0.1. See xgb.train}
-
 \item{PS.cv.eval_metric}{(xgboost.cv only) a character string indicating evaluation metrics for validation data. Default="auc". See xgb.train}
 
 \item{PS.cv.colsample_bytree}{(xgboost.cv only) a numeric vector indicating subsample ratio of columns when constructing each tree. Default=1. See. xgb.train}
@@ -158,8 +156,6 @@ estimateATT(
 \item{CGPS.cv.nthread}{(xgboost.cv only) a numeric vector indicating the number of thread. Default=1. See xgb.train}
 
 \item{CGPS.cv.subsample}{(xgboost.cv only) a numeric vector indicating subsample ratio of the training instance. Default=0.5. See xgb.train}
-
-\item{CGPS.cv.gamma}{(xgboost.cv only) a numeric vector indicating minimum loss reduction required to make a further partition on a leaf node of the tree. Default=0.1. See xgb.train}
 
 \item{CGPS.cv.eval_metric}{(xgboost.cv only) a character string indicating evaluation metrics for validation data. Default="auc". See xgb.train}
 

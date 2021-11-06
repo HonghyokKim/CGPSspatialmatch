@@ -7,8 +7,8 @@
 xgb.model.cv(
   data,
   cv.objective,
-  cv.nround = 1000,
-  cv.nfold = 10,
+  cv.nround = 10000,
+  cv.nfold = 5,
   cv.max_depth = 5,
   cv.eta = 0.1,
   cv.nthread = 1,
@@ -17,7 +17,7 @@ xgb.model.cv(
   cv.eval_metric,
   cv.colsample_bytree = 1,
   cv.min_child_weight = 1,
-  early_stopping_rounds = 10,
+  early_stopping_rounds = 50,
   cv.local.N = 100
 )
 }
