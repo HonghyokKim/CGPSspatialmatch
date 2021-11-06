@@ -22,6 +22,8 @@ estimateATT(
   PS.eval_metric = "auc",
   PS.objective = "binary:logistic",
   PS.nrounds = 50,
+  PS.cv.nround = 1000,
+  PS.cv.nfold = 10,
   PS.cv.objective = "binary:logistic",
   PS.cv.max_depth = 5,
   PS.cv.eta = 0.1,
@@ -35,6 +37,8 @@ estimateATT(
   PS.cv.local.N = 100,
   CGPS.method = "mgcv.GAM",
   CGPS.formula,
+  CGPS.cv.nround = 1000,
+  CGPS.cv.nfold = 10,
   CGPS.max_depth = 5,
   CGPS.eta = 0.1,
   CGPS.nthread = 1,
@@ -99,6 +103,10 @@ estimateATT(
 
 \item{PS.nrounds}{(xgboost only) a numeric vector indicating the number of rounds. Default=50. See xgb.train.}
 
+\item{PS.cv.nround}{(xgboost.cv only) a numeric vector indicating the maximum number of rounds.}
+
+\item{PS.cv.nfold}{(xgboost.cv only) a numeric vector indicating N-fold cross-validation.}
+
 \item{PS.cv.objective}{(xgboost.cv only) a character string indicating the objective function. Default="binary:logistic" See xgb.train}
 
 \item{PS.cv.max_depth}{(xgboost.cv only) a numeric vector indicating maximum depth of a tree. Default=5.}
@@ -124,6 +132,10 @@ estimateATT(
 \item{CGPS.method}{a character string or a vector of variable names, indicating the method of conditional propensity score estimation. Options include "mgcv.GAM", "xgboost", and "xgboost.cv". Default="mgcv.GAM".}
 
 \item{CGPS.formula}{a character string indicating the formula of conditional generalized propensity score estimation}
+
+\item{CGPS.cv.nround}{(xgboost.cv only) a numeric vector indicating the maximum number of rounds.}
+
+\item{CGPS.cv.nfold}{(xgboost.cv only) a numeric vector indicating N-fold cross-validation.}
 
 \item{CGPS.max_depth}{(xgboost only) a numeric vector indicating maximum depth of a tree. Default=5}
 
