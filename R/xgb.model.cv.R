@@ -15,7 +15,7 @@ xgb.model.cv<-function(cv.local.N,max_depth,eta,subsample) {
   )
   seedn = sample.int(100000, 1)
   set.seed(seedn)
-  cvfit <- xgboost::xgb.cv(data=data, params = param, 
+  cvfit <- xgboost::xgb.cv(data=boost.dat, params = param, 
                            nfold=cv.nfold, nrounds=cv.nround,
                            verbose = F,early_stopping_rounds=early_stopping_rounds,maximize=FALSE)
   

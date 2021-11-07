@@ -148,7 +148,7 @@ estimateATT<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbu
       boost.fitdat<-data.matrix(dataset[,PS.formula])
       boost.dat<-xgboost::xgb.DMatrix(boost.fitdat, label = dataset[,bexp])
       
-      PSmodel <- CGPSspatialmatch::xgb.model.fit.cv(data=boost.dat,cv.nround=PS.cv.nround,cv.nfold=PS.cv.nfold,cv.objective=PS.cv.objective,cv.max_depth=PS.cv.max_depth,cv.eta=PS.cv.eta,cv.nthread=PS.cv.nthread,cv.subsample=PS.cv.subsample,cv.gamma=PS.cv.gamma,cv.eval_metric=PS.cv.eval_metric,cv.colsample_bytree=PS.cv.colsample_bytree,cv.min_child_weight=PS.cv.min_child_weight,early_stopping_rounds=PS.early_stopping_rounds,cv.local.N=PS.cv.local.N)
+      PSmodel <- CGPSspatialmatch::xgb.model.fit.cv(data=boost.dat,cv.nround=PS.cv.nround,cv.nfold=PS.cv.nfold,cv.objective=PS.cv.objective,cv.max_depth=PS.cv.max_depth,cv.eta=PS.cv.eta,cv.nthread=PS.cv.nthread,cv.subsample=PS.cv.subsample,cv.eval_metric=PS.cv.eval_metric,cv.colsample_bytree=PS.cv.colsample_bytree,cv.min_child_weight=PS.cv.min_child_weight,early_stopping_rounds=PS.early_stopping_rounds,cv.local.N=PS.cv.local.N)
 
       pred.dat<-lapply(bootsp.m, function(data) {
         data.matrix(data[,PS.formula])
@@ -194,7 +194,7 @@ estimateATT<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbu
       tryCatch(expr={
         boost.fitdat<-data.matrix(dataset[dataset[,bexp]==1,CGPS.formula])
         boost.dat<-xgboost::xgb.DMatrix(boost.fitdat, label = dataset[dataset[,bexp]==1,cexp])
-        CGPS.model <- CGPSspatialmatch::xgb.model.fit.cv(data=boost.dat,cv.nround=CGPS.cv.nround,cv.nfold=CGPS.cv.nfold,cv.objective=CGPS.cv.objective,cv.max_depth=CGPS.cv.max_depth,cv.eta=CGPS.cv.eta,cv.nthread=CGPS.cv.nthread,cv.subsample=CGPS.cv.subsample,cv.gamma=CGPS.cv.gamma,cv.eval_metric=CGPS.cv.eval_metric,cv.colsample_bytree=CGPS.cv.colsample_bytree,cv.min_child_weight=CGPS.cv.min_child_weight,early_stopping_rounds=CGPS.early_stopping_rounds,cv.local.N=CGPS.cv.local.N)
+        CGPS.model <- CGPSspatialmatch::xgb.model.fit.cv(data=boost.dat,cv.nround=CGPS.cv.nround,cv.nfold=CGPS.cv.nfold,cv.objective=CGPS.cv.objective,cv.max_depth=CGPS.cv.max_depth,cv.eta=CGPS.cv.eta,cv.nthread=CGPS.cv.nthread,cv.subsample=CGPS.cv.subsample,cv.eval_metric=CGPS.cv.eval_metric,cv.colsample_bytree=CGPS.cv.colsample_bytree,cv.min_child_weight=CGPS.cv.min_child_weight,early_stopping_rounds=CGPS.early_stopping_rounds,cv.local.N=CGPS.cv.local.N)
 
         message(">>>>>>>>STEP 3: CGPS estimation (xgboost) sucessfully done")
         message(">>>>>>>>STEP 4: Matching by GPS initiated")
