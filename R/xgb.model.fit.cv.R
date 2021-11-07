@@ -3,7 +3,7 @@
 #' This internal function explores optimal parameters in xgb.train using cross-validation
 #' xgb.model.fit.cv()
 
-xgb.model.fit.cv<-function(data,cv.objective,cv.nround=10000,cv.nfold=5,cv.max_depth=c(4,5),cv.eta=c(0.01,0.05,0.1),cv.nthread=1,cv.subsample=1,cv.eval_metric,cv.colsample_bytree=1,cv.min_child_weight=1,early_stopping_rounds=50,cv.local.N=10) {
+xgb.model.fit.cv<-function(data,cv.objective,cv.nround,cv.nfold,cv.min.burnin,cv.max_depth,cv.eta,cv.nthread,cv.subsample,cv.eval_metric,cv.colsample_bytree,cv.min_child_weight,early_stopping_rounds,cv.local.N) {
   CV.start.time<-Sys.time()
   hyperparam<-expand.grid(cv.max_depth,cv.eta,cv.subsample,cv.local.N)
   colnames(hyperparam)<-c("max_depth","subsample","eta","cv.local.N")
@@ -23,16 +23,18 @@ xgb.model.fit.cv<-function(data,cv.objective,cv.nround=10000,cv.nfold=5,cv.max_d
                   cvfit <- xgboost::xgb.cv(data=data, params = param, 
                                            nfold=cv.nfold, nrounds=cv.nround,
                                            verbose = F,early_stopping_rounds=early_stopping_rounds,maximize=FALSE)
-                  
-                  min.evalmetric<-cvfit$evaluation_log[cvfit$best_iteration,4]
-                  min.evalmetric.index<-cvfit$evaluation_log[cvfit$best_iteration,1]
+                  cvlog<-cvfit$evaluation_log
+                  cvlog<-subset(cvlog,iter>cv.min.burnin)
+                  cvlog<-data.frame(cvlog)
+                  cvlog<-cvlog[cvlog[,4]==min(cvlog[,4]),]
                   return(data.frame(max_depth=max_depth,eta=eta,subsample=subsample,
-                                    seedn=seedn,iter=min.evalmetric.index,evalmetric=min.evalmetric))
+                                    seedn=seedn,iter=cvlog[,1],evalmetric=cvlog[,4]))
                 },
                 
                 SIMPLIFY = FALSE)
   CV.result<-do.call(rbind,CVrun)
-  CV.result<-CV.result[CV.result[,6]==min(CV.result[,6]),]         
+  CV.result<-CV.result[CV.result[,6]==min(CV.result[,6]),]     
+  print(CV.result)
   nround = CV.result$iter
   param <- list(objective = cv.objective,
                 max_depth = CV.result$max_depth,
