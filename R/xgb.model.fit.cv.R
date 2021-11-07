@@ -32,8 +32,7 @@ xgb.model.fit.cv<-function(data,cv.objective,cv.nround=10000,cv.nfold=5,cv.max_d
                 
                 SIMPLIFY = FALSE)
   CV.result<-do.call(rbind,CVrun)
-  CV.result<-CV.result[CV.result$test_auc_mean==min(CV.result$test_auc_mean),]         
-  
+  CV.result<-CV.result[CV.result[,6]==min(CV.result[,6]),]         
   nround = CV.result$iter
   param <- list(objective = cv.objective,
                 max_depth = CV.result$max_depth,
