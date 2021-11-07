@@ -11,7 +11,7 @@ estimateATT(
   cexp,
   fmethod.replace = TRUE,
   distbuf = 0.1,
-  exp.included = TRUE,
+  exp.included = FALSE,
   long,
   lat,
   PS.method = "mgcv.GAM",
@@ -21,43 +21,41 @@ estimateATT(
   PS.nthread = 1,
   PS.eval_metric = "auc",
   PS.objective = "binary:logistic",
-  PS.nrounds = 50,
-  PS.cv.nround = 1000,
-  PS.cv.nfold = 10,
+  PS.nrounds = 100,
+  PS.cv.nround = 10000,
+  PS.cv.nfold = 5,
   PS.cv.objective = "binary:logistic",
-  PS.cv.max_depth = 5,
-  PS.cv.eta = 0.1,
+  PS.cv.max_depth = c(4, 5),
+  PS.cv.eta = c(0.01, 0.05, 0.1),
   PS.cv.nthread = 1,
-  PS.cv.subsample = 0.5,
-  PS.cv.gamma = 0.1,
+  PS.cv.subsample = 1,
   PS.cv.eval_metric = "auc",
   PS.cv.colsample_bytree = 1,
   PS.cv.min_child_weight = 1,
-  PS.early_stopping_rounds = 10,
-  PS.cv.local.N = 100,
+  PS.early_stopping_rounds = 50,
+  PS.cv.local.N = 10,
   CGPS.method = "mgcv.GAM",
   CGPS.formula,
-  CGPS.cv.nround = 1000,
-  CGPS.cv.nfold = 10,
+  CGPS.cv.nround = 10000,
+  CGPS.cv.nfold = 5,
   CGPS.max_depth = 5,
   CGPS.eta = 0.1,
   CGPS.nthread = 1,
   CGPS.eval_metric = "rmse",
   CGPS.objective = "reg:squarederror",
-  CGPS.nrounds = 50,
+  CGPS.nrounds = 100,
   CGPS.cv.objective = "reg:squarederror",
-  CGPS.cv.max_depth = 5,
-  CGPS.cv.eta = 0.1,
+  CGPS.cv.max_depth = c(4, 5),
+  CGPS.cv.eta = c(0.01, 0.05, 0.1),
   CGPS.cv.nthread = 1,
-  CGPS.cv.subsample = 0.5,
-  CGPS.cv.gamma = 0.1,
+  CGPS.cv.subsample = 1,
   CGPS.cv.eval_metric = "rmse",
   CGPS.cv.colsample_bytree = 1,
   CGPS.cv.min_child_weight = 1,
-  CGPS.early_stopping_rounds = 10,
-  CGPS.cv.local.N = 100,
-  smethod = "caliper",
-  caliper_bw = 0.1,
+  CGPS.early_stopping_rounds = 50,
+  CGPS.cv.local.N = 10,
+  smethod = "nearest",
+  caliper_bw = NULL,
   smethod.replace = FALSE,
   weight.cutoff = 10,
   formulaDisease,
@@ -101,7 +99,7 @@ estimateATT(
 
 \item{PS.objective}{(xgboost only) a character string indicating the objective function. Default="binary:logistic". See xgb.train}
 
-\item{PS.nrounds}{(xgboost only) a numeric vector indicating the number of rounds. Default=50. See xgb.train.}
+\item{PS.nrounds}{(xgboost only) a numeric vector indicating the number of rounds. Default=100. See xgb.train.}
 
 \item{PS.cv.nround}{(xgboost.cv only) a numeric vector indicating the maximum number of rounds.}
 
@@ -109,11 +107,11 @@ estimateATT(
 
 \item{PS.cv.objective}{(xgboost.cv only) a character string indicating the objective function. Default="binary:logistic" See xgb.train}
 
-\item{PS.cv.max_depth}{(xgboost.cv only) a numeric vector indicating maximum depth of a tree. Default=5.}
+\item{PS.cv.max_depth}{(xgboost.cv only) a numeric vector indicating maximum depth of a tree.}
 
-\item{PS.cv.eta}{(xgboost.cv only) a numeric vector indicating the learning rate. Default=0.1.}
+\item{PS.cv.eta}{(xgboost.cv only) a numeric vector indicating the learning rate.}
 
-\item{PS.cv.nthread}{(xgboost.cv only) a numeric vector indicating the number of thread. Default=1. See xgb.train}
+\item{PS.cv.nthread}{(xgboost.cv only) a numeric vector indicating the number of thread. See xgb.train}
 
 \item{PS.cv.subsample}{(xgboost.cv only) a numeric vector indicating subsample ratio of the training instance. Default=0.5. See xgb.train}
 
@@ -125,7 +123,7 @@ estimateATT(
 
 \item{PS.early_stopping_rounds}{(xgboost.cv only) a numeric vector indicating when xgboost stops. If the evaluation metric did not decrease until when (code)PS.early_stopping_rounds, xgboost stops. This saves time.}
 
-\item{PS.cv.local.N}{(xgboost.cv only) a numeric vector indicating how many times xgboost will search (local) mini-ma of the evaluation metric function. Default=100}
+\item{PS.cv.local.N}{(xgboost.cv only) a numeric vector indicating how many times xgboost will search (local) mini-ma of the evaluation metric function. Default=10}
 
 \item{CGPS.method}{a character string or a vector of variable names, indicating the method of conditional propensity score estimation. Options include "mgcv.GAM", "xgboost", and "xgboost.cv". Default="mgcv.GAM".}
 
@@ -145,17 +143,17 @@ estimateATT(
 
 \item{CGPS.objective}{(xgboost only) a character string indicating the objective function. Default="reg:squarederror". See xgb.train}
 
-\item{CGPS.nrounds}{(xgboost only) a numeric vector indicating the number of rounds. Default=50. See xgb.train.}
+\item{CGPS.nrounds}{(xgboost only) a numeric vector indicating the number of rounds. Default=100. See xgb.train.}
 
 \item{CGPS.cv.objective}{(xgboost.cv only) a character string indicating the objective function. Default="binary:logistic" See xgb.train}
 
-\item{CGPS.cv.max_depth}{(xgboost.cv only) a numeric vector indicating maximum depth of a tree. Default=5.}
+\item{CGPS.cv.max_depth}{(xgboost.cv only) a numeric vector indicating maximum depth of a tree.}
 
-\item{CGPS.cv.eta}{(xgboost.cv only) a numeric vector indicating the learning rate. Default=0.1.}
+\item{CGPS.cv.eta}{(xgboost.cv only) a numeric vector indicating the learning rate.}
 
 \item{CGPS.cv.nthread}{(xgboost.cv only) a numeric vector indicating the number of thread. Default=1. See xgb.train}
 
-\item{CGPS.cv.subsample}{(xgboost.cv only) a numeric vector indicating subsample ratio of the training instance. Default=0.5. See xgb.train}
+\item{CGPS.cv.subsample}{(xgboost.cv only) a numeric vector indicating subsample ratio of the training instance. See xgb.train}
 
 \item{CGPS.cv.eval_metric}{(xgboost.cv only) a character string indicating evaluation metrics for validation data. Default="auc". See xgb.train}
 
@@ -165,7 +163,7 @@ estimateATT(
 
 \item{CGPS.early_stopping_rounds}{(xgboost.cv only) a numeric vector indicating when xgboost stoCGPS. If the evaluation metric did not decrease until when (code)CGPS.early_stopping_rounds, xgboost stoCGPS. This saves time.}
 
-\item{CGPS.cv.local.N}{(xgboost.cv only) a numeric vector indicating how many times xgboost will search (local) mini-ma of the evaluation metric function. Default=100}
+\item{CGPS.cv.local.N}{(xgboost.cv only) a numeric vector indicating how many times xgboost will search (local) mini-ma of the evaluation metric function. Default=10}
 
 \item{smethod}{method a character string indicating the matching method used to conduct matching by GCGPS. Default="caliper". Options include "nearest" (nearest neighbor matching) and "caliper" (caliper matching)}
 
