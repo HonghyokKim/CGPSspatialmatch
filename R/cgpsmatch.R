@@ -30,8 +30,9 @@ cgpsmatch<-function(data,bexp,cexp,ps,model.exponly,expstatus=1,method=NULL,cali
   
   GPS_exponly <- dnorm(exponly[,cexp],mean=predict(model.exponly,newdata=exponly.pred),sd=sqrt(mean( (predict(model.exponly,newdata=exponly.pred)-exponly[,cexp])^2 )))
   GPS_exponly_Cstab <- dnorm(exponly[,cexp],mean=mean(exponly[,cexp],na.rm=T),sd=sd(exponly[,cexp],na.rm=T))
-  set.seed(sample.int(10000,1))
-  cf_unexposed <- rnorm(nrow(unexponly.pred),mean=predict(model.exponly,newdata=unexponly.pred),sd=sqrt(mean( (predict(model.exponly,newdata=exponly.pred)-exponly[,cexp])^2)) )
+  
+ #cf_unexposed <- rnorm(nrow(unexponly.pred),mean=predict(model.exponly,newdata=unexponly.pred),sd=sqrt(mean( (predict(model.exponly,newdata=exponly.pred)-exponly[,cexp])^2)) )
+  cf_unexposed <- sample(predict(model.exponly,newdata=unexponly.pred),nrow(unexponly.pred),replace=TRUE)
   GPS_unexponly <- dnorm(cf_unexposed,mean=predict(model.exponly,newdata=unexponly.pred),sd=sqrt(mean( (predict(model.exponly,newdata=exponly.pred)-exponly[,cexp])^2 )))
   GPS_unexponly_Cstab <- dnorm(cf_unexposed,mean=mean(cf_unexposed,na.rm=T),sd=sd(cf_unexposed,na.rm=T))
   
