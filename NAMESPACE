@@ -7,5 +7,4 @@ export(match.nearest)
 export(matchdist)
 export(smd)
 export(xgb.model.fit.cv)
-export(xgb.model.cv)
 
