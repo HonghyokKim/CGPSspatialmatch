@@ -189,7 +189,7 @@ estimateATT<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbu
     )
     }
     
-    if(CGPS.method=="xgboost") {
+    if(CGPS.method=="xgboost.cv") {
 
       tryCatch(expr={
         boost.fitdat<-data.matrix(dataset[dataset[,bexp]==1,CGPS.formula])
@@ -205,7 +205,7 @@ estimateATT<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbu
       )
     }
     
-    if(CGPS.method=="xgboost.cv") {
+    if(CGPS.method=="xgboost") {
       
       tryCatch(expr={
         boost.fitdat<-data.matrix(dataset[dataset[,bexp]==1,CGPS.formula])
@@ -241,7 +241,7 @@ estimateATT<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbu
         eval(bquote(gnm::gnm(.(f3), data=data,family=family,eliminate=as.factor(strata_matchdist))))
       })
       message(">>>>>>>>STEP 5: Disease model estimation sucessfully done")
-      message(">>ATE has been successfully estimated by CGPS spatial matching procedure with bootstrapping. Check the distribution of bootstrapped estimates")
+      message(">>ATt has been successfully estimated by CGPS spatial matching procedure with bootstrapping. Check the distribution of bootstrapped estimates")
     }
     ,
     error=function(e) {e;message("Disease model estimation failed: check the dataset and/or parameterization")},
