@@ -24,6 +24,8 @@ estimateATT(
   PS.nrounds = 100,
   PS.cv.nround = 10000,
   PS.cv.nfold = 5,
+  PS.cv.min.burnin = 99,
+  PS.early_stopping_rounds = 100,
   PS.cv.objective = "binary:logistic",
   PS.cv.max_depth = c(4, 5),
   PS.cv.eta = c(0.01, 0.05, 0.1),
@@ -32,12 +34,13 @@ estimateATT(
   PS.cv.eval_metric = "auc",
   PS.cv.colsample_bytree = 1,
   PS.cv.min_child_weight = 1,
-  PS.early_stopping_rounds = 50,
   PS.cv.local.N = 10,
   CGPS.method = "mgcv.GAM",
   CGPS.formula,
   CGPS.cv.nround = 10000,
   CGPS.cv.nfold = 5,
+  CGPS.cv.min.burnin = 99,
+  CGPS.early_stopping_rounds = 100,
   CGPS.max_depth = 5,
   CGPS.eta = 0.1,
   CGPS.nthread = 1,
@@ -52,7 +55,6 @@ estimateATT(
   CGPS.cv.eval_metric = "rmse",
   CGPS.cv.colsample_bytree = 1,
   CGPS.cv.min_child_weight = 1,
-  CGPS.early_stopping_rounds = 50,
   CGPS.cv.local.N = 10,
   smethod = "nearest",
   caliper_bw = NULL,
@@ -105,6 +107,10 @@ estimateATT(
 
 \item{PS.cv.nfold}{(xgboost.cv only) a numeric vector indicating N-fold cross-validation.}
 
+\item{PS.cv.min.burnin}{(xgboost.cv only) a numeric vector indicating the minimum number of rounds. Default=99, which indicates the minimum number of rounds is 100. This must be smaller than PS.early_stopping_rounds.}
+
+\item{PS.early_stopping_rounds}{(xgboost.cv only) a numeric vector indicating when xgboost stops. If the evaluation metric did not decrease until when (code)PS.early_stopping_rounds, xgboost stops. This saves time. Default=100.}
+
 \item{PS.cv.objective}{(xgboost.cv only) a character string indicating the objective function. Default="binary:logistic" See xgb.train}
 
 \item{PS.cv.max_depth}{(xgboost.cv only) a numeric vector indicating maximum depth of a tree.}
@@ -121,8 +127,6 @@ estimateATT(
 
 \item{PS.cv.min_child_weight}{(xgboost.cv only) Default=1. See. xgb.train}
 
-\item{PS.early_stopping_rounds}{(xgboost.cv only) a numeric vector indicating when xgboost stops. If the evaluation metric did not decrease until when (code)PS.early_stopping_rounds, xgboost stops. This saves time.}
-
 \item{PS.cv.local.N}{(xgboost.cv only) a numeric vector indicating how many times xgboost will search (local) mini-ma of the evaluation metric function. Default=10}
 
 \item{CGPS.method}{a character string or a vector of variable names, indicating the method of conditional propensity score estimation. Options include "mgcv.GAM", "xgboost", and "xgboost.cv". Default="mgcv.GAM".}
@@ -132,6 +136,10 @@ estimateATT(
 \item{CGPS.cv.nround}{(xgboost.cv only) a numeric vector indicating the maximum number of rounds.}
 
 \item{CGPS.cv.nfold}{(xgboost.cv only) a numeric vector indicating N-fold cross-validation.}
+
+\item{CGPS.cv.min.burnin}{(xgboost.cv only) a numeric vector indicating the minimum number of rounds. Default=99, which indicates the minimum number of rounds is 100. This must be smaller than PS.early_stopping_rounds.}
+
+\item{CGPS.early_stopping_rounds}{(xgboost.cv only) a numeric vector indicating when xgboost stoCGPS. If the evaluation metric did not decrease until when (code)CGPS.early_stopping_rounds, xgboost stops This saves time. Default=100.}
 
 \item{CGPS.max_depth}{(xgboost only) a numeric vector indicating maximum depth of a tree. Default=5}
 
@@ -160,8 +168,6 @@ estimateATT(
 \item{CGPS.cv.colsample_bytree}{(xgboost.cv only) a numeric vector indicating subsample ratio of columns when constructing each tree. Default=1. See. xgb.train}
 
 \item{CGPS.cv.min_child_weight}{(xgboost.cv only) Default=1. See. xgb.train}
-
-\item{CGPS.early_stopping_rounds}{(xgboost.cv only) a numeric vector indicating when xgboost stoCGPS. If the evaluation metric did not decrease until when (code)CGPS.early_stopping_rounds, xgboost stoCGPS. This saves time.}
 
 \item{CGPS.cv.local.N}{(xgboost.cv only) a numeric vector indicating how many times xgboost will search (local) mini-ma of the evaluation metric function. Default=10}
 

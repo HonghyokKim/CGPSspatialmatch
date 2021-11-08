@@ -7,17 +7,18 @@
 xgb.model.fit.cv(
   data,
   cv.objective,
-  cv.nround = 10000,
-  cv.nfold = 5,
-  cv.max_depth = c(4, 5),
-  cv.eta = c(0.01, 0.05, 0.1),
-  cv.nthread = 1,
-  cv.subsample = 1,
+  cv.nround,
+  cv.nfold,
+  cv.min.burnin,
+  cv.max_depth,
+  cv.eta,
+  cv.nthread,
+  cv.subsample,
   cv.eval_metric,
-  cv.colsample_bytree = 1,
-  cv.min_child_weight = 1,
-  early_stopping_rounds = 50,
-  cv.local.N = 10
+  cv.colsample_bytree,
+  cv.min_child_weight,
+  early_stopping_rounds,
+  cv.local.N
 )
 }
 \description{
