@@ -28,7 +28,8 @@
 #' @param PS.cv.eval_metric (xgboost.cv only) a character string indicating evaluation metrics for validation data. Default="auc". See xgb.train
 #' @param PS.cv.colsample_bytree (xgboost.cv only) a numeric vector indicating subsample ratio of columns when constructing each tree. Default=1. See. xgb.train
 #' @param PS.cv.min_child_weight (xgboost.cv only) Default=1. See. xgb.train
-#' @param PS.early_stopping_rounds (xgboost.cv only) a numeric vector indicating when xgboost stops. If the evaluation metric did not decrease until when (code)PS.early_stopping_rounds, xgboost stops. This saves time.
+#' @param PS.cv.min.burnin (xgboost.cv only) a numeric vector indicating the minimum number of rounds. Default=99, which indicates the minimum number of rounds is 100. This must be smaller than PS.early_stopping_rounds.
+#' @param PS.early_stopping_rounds (xgboost.cv only) a numeric vector indicating when xgboost stops. If the evaluation metric did not decrease until when (code)PS.early_stopping_rounds, xgboost stops. This saves time. Default=100.
 #' @param PS.cv.local.N (xgboost.cv only) a numeric vector indicating how many times xgboost will search (local) mini-ma of the evaluation metric function. Default=10
 #' @param CGPS.method a character string or a vector of variable names, indicating the method of conditional propensity score estimation. Options include "mgcv.GAM", "xgboost", and "xgboost.cv". Default="mgcv.GAM".
 #' @param CGPS.formula a character string indicating the formula of conditional generalized propensity score estimation
@@ -48,7 +49,8 @@
 #' @param CGPS.cv.eval_metric (xgboost.cv only) a character string indicating evaluation metrics for validation data. Default="auc". See xgb.train
 #' @param CGPS.cv.colsample_bytree (xgboost.cv only) a numeric vector indicating subsample ratio of columns when constructing each tree. Default=1. See. xgb.train
 #' @param CGPS.cv.min_child_weight (xgboost.cv only) Default=1. See. xgb.train
-#' @param CGPS.early_stopping_rounds (xgboost.cv only) a numeric vector indicating when xgboost stoCGPS. If the evaluation metric did not decrease until when (code)CGPS.early_stopping_rounds, xgboost stoCGPS. This saves time.
+#' @param CGPS.cv.min.burnin (xgboost.cv only) a numeric vector indicating the minimum number of rounds. Default=99, which indicates the minimum number of rounds is 100. This must be smaller than PS.early_stopping_rounds.
+#' @param CGPS.early_stopping_rounds (xgboost.cv only) a numeric vector indicating when xgboost stoCGPS. If the evaluation metric did not decrease until when (code)CGPS.early_stopping_rounds, xgboost stops This saves time. Default=100.
 #' @param CGPS.cv.local.N (xgboost.cv only) a numeric vector indicating how many times xgboost will search (local) mini-ma of the evaluation metric function. Default=10
 #' @param smethod method a character string indicating the matching method used to conduct matching by GCGPS. Default="caliper". Options include "nearest" (nearest neighbor matching) and "caliper" (caliper matching)
 #' @param caliper_bw a numeric vector indicating caliper bandwidth. Default=0.1. If method is "nearest", this parameter is ignored.
@@ -67,12 +69,12 @@
 estimateATT<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbuf=0.1,exp.included=FALSE,long,lat,
                      PS.method="mgcv.GAM",PS.formula,
                      PS.max_depth=5, PS.eta=0.1, PS.nthread=1, PS.eval_metric="auc", PS.objective="binary:logistic", PS.nrounds=100,
-                     PS.cv.nround=10000,PS.cv.nfold=5,
-                     PS.cv.objective="binary:logistic",PS.cv.max_depth=c(4,5),PS.cv.eta=c(0.01,0.05,0.1),PS.cv.nthread=1,PS.cv.subsample=1,PS.cv.eval_metric="auc",PS.cv.colsample_bytree=1,PS.cv.min_child_weight=1,PS.early_stopping_rounds=50,PS.cv.local.N=10,
+                     PS.cv.nround=10000,PS.cv.nfold=5,PS.cv.min.burnin=99,PS.early_stopping_rounds=100,
+                     PS.cv.objective="binary:logistic",PS.cv.max_depth=c(4,5),PS.cv.eta=c(0.01,0.05,0.1),PS.cv.nthread=1,PS.cv.subsample=1,PS.cv.eval_metric="auc",PS.cv.colsample_bytree=1,PS.cv.min_child_weight=1,PS.cv.local.N=10,
                      CGPS.method="mgcv.GAM",CGPS.formula,
-                     CGPS.cv.nround=10000,CGPS.cv.nfold=5,
+                     CGPS.cv.nround=10000,CGPS.cv.nfold=5,CGPS.cv.min.burnin=99,CGPS.early_stopping_rounds=100,
                      CGPS.max_depth=5, CGPS.eta=0.1, CGPS.nthread=1, CGPS.eval_metric="rmse", CGPS.objective="reg:squarederror", CGPS.nrounds=100,
-                     CGPS.cv.objective="reg:squarederror",CGPS.cv.max_depth=c(4,5),CGPS.cv.eta=c(0.01,0.05,0.1),CGPS.cv.nthread=1,CGPS.cv.subsample=1,CGPS.cv.eval_metric="rmse",CGPS.cv.colsample_bytree=1,CGPS.cv.min_child_weight=1,CGPS.early_stopping_rounds=50,CGPS.cv.local.N=10,
+                     CGPS.cv.objective="reg:squarederror",CGPS.cv.max_depth=c(4,5),CGPS.cv.eta=c(0.01,0.05,0.1),CGPS.cv.nthread=1,CGPS.cv.subsample=1,CGPS.cv.eval_metric="rmse",CGPS.cv.colsample_bytree=1,CGPS.cv.min_child_weight=1,CGPS.cv.local.N=10,
                      smethod="nearest",caliper_bw=NULL,smethod.replace=FALSE,weight.cutoff=10,
                      formulaDisease,family,
                      bs.N,bs.replace=TRUE,
@@ -148,7 +150,20 @@ estimateATT<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbu
       boost.fitdat<-data.matrix(dataset[,PS.formula])
       boost.dat<-xgboost::xgb.DMatrix(boost.fitdat, label = dataset[,bexp])
       
-      PSmodel <- CGPSspatialmatch::xgb.model.fit.cv(data=boost.dat,cv.nround=PS.cv.nround,cv.nfold=PS.cv.nfold,cv.objective=PS.cv.objective,cv.max_depth=PS.cv.max_depth,cv.eta=PS.cv.eta,cv.nthread=PS.cv.nthread,cv.subsample=PS.cv.subsample,cv.eval_metric=PS.cv.eval_metric,cv.colsample_bytree=PS.cv.colsample_bytree,cv.min_child_weight=PS.cv.min_child_weight,early_stopping_rounds=PS.early_stopping_rounds,cv.local.N=PS.cv.local.N)
+      PSmodel <- CGPSspatialmatch::xgb.model.fit.cv(data=boost.dat,
+                                                    cv.nround=PS.cv.nround,
+                                                    cv.nfold=PS.cv.nfold,
+                                                    cv.objective=PS.cv.objective,
+                                                    cv.max_depth=PS.cv.max_depth,
+                                                    cv.eta=PS.cv.eta,
+                                                    cv.nthread=PS.cv.nthread,
+                                                    cv.subsample=PS.cv.subsample,
+                                                    cv.eval_metric=PS.cv.eval_metric,
+                                                    cv.colsample_bytree=PS.cv.colsample_bytree,
+                                                    cv.min_child_weight=PS.cv.min_child_weight,
+                                                    cv.min.burnin=PS.cv.min.burnin,
+                                                    early_stopping_rounds=PS.early_stopping_rounds,
+                                                    cv.local.N=PS.cv.local.N)
 
       pred.dat<-lapply(bootsp.m, function(data) {
         data.matrix(data[,PS.formula])
@@ -194,8 +209,20 @@ estimateATT<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbu
       tryCatch(expr={
         boost.fitdat<-data.matrix(dataset[dataset[,bexp]==1,CGPS.formula])
         boost.dat<-xgboost::xgb.DMatrix(boost.fitdat, label = dataset[dataset[,bexp]==1,cexp])
-        CGPS.model <- CGPSspatialmatch::xgb.model.fit.cv(data=boost.dat,cv.nround=CGPS.cv.nround,cv.nfold=CGPS.cv.nfold,cv.objective=CGPS.cv.objective,cv.max_depth=CGPS.cv.max_depth,cv.eta=CGPS.cv.eta,cv.nthread=CGPS.cv.nthread,cv.subsample=CGPS.cv.subsample,cv.eval_metric=CGPS.cv.eval_metric,cv.colsample_bytree=CGPS.cv.colsample_bytree,cv.min_child_weight=CGPS.cv.min_child_weight,early_stopping_rounds=CGPS.early_stopping_rounds,cv.local.N=CGPS.cv.local.N)
-
+        CGPS.model <- xgb.model.fit.cv(data=boost.dat,
+                                       cv.nround=CGPS.cv.nround,
+                                       cv.nfold=CGPS.cv.nfold,
+                                       cv.objective=CGPS.cv.objective,
+                                       cv.max_depth=CGPS.cv.max_depth,
+                                       cv.eta=CGPS.cv.eta,
+                                       cv.nthread=CGPS.cv.nthread,
+                                       cv.subsample=CGPS.cv.subsample,
+                                       cv.eval_metric=CGPS.cv.eval_metric,
+                                       cv.colsample_bytree=CGPS.cv.colsample_bytree,
+                                       cv.min_child_weight=CGPS.cv.min_child_weight,
+                                       cv.min.burnin=CGPS.cv.min.burnin,
+                                       early_stopping_rounds=CGPS.early_stopping_rounds,
+                                       cv.local.N=CGPS.cv.local.N)
         message(">>>>>>>>STEP 3: CGPS estimation (xgboost) sucessfully done")
         message(">>>>>>>>STEP 4: Matching by GPS initiated")
       }
