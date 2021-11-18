@@ -67,7 +67,9 @@
 #' estimateATT()
 
 estimateATT<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbuf=0.1,exp.included=FALSE,long,lat,
-                     PS.method="mgcv.GAM",PS.formula,
+                     PS.method="mgcv.GAM",
+                     PS.method.data="original",
+                     PS.formula,
                      PS.max_depth=5, PS.eta=0.1, PS.nthread=1, PS.eval_metric="auc", PS.objective="binary:logistic", PS.nrounds=100,
                      PS.cv.nround=10000,PS.cv.nfold=5,PS.cv.min.burnin=99,PS.early_stopping_rounds=100,
                      PS.cv.objective="binary:logistic",PS.cv.max_depth=c(4,5),PS.cv.eta=c(0.01,0.05,0.1),PS.cv.nthread=1,PS.cv.subsample=1,PS.cv.eval_metric="auc",PS.cv.colsample_bytree=1,PS.cv.min_child_weight=1,PS.cv.local.N=10,
@@ -100,24 +102,40 @@ estimateATT<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbu
   message(">>>>>>>>STEP 2: PS estimation initiated")
   
   if(PS.method=="mgcv.GAM") {
-  tryCatch(expr={
-      f1 <- as.formula(
-        paste(PS.formula))
-      PSmodel<-eval(bquote(mgcv::gam(.(f1), data=dataset, family="binomial")))
-      PS.m<-lapply(bootsp.m,function(data){
-        data$PS<-predict(PSmodel,newdata=data,type="response")
-        data
-      })
+      tryCatch(expr={
+        if(PS.method.data=="original") {
+          f1 <- as.formula(
+            paste(PS.formula))
+          PSmodel<-eval(bquote(mgcv::gam(.(f1), data=dataset, family="binomial")))
+          PS.m<-lapply(bootsp.m,function(data){
+            data$PS<-predict(PSmodel,newdata=data,type="response")
+            data
+          })
+        }
+        
+        if(PS.method.data=="aftermatch") {
+          f1 <- as.formula(
+            paste0(PS.formula,"+as.factor(strata_matchdist)"))
+          PSmodel<-lapply(bootsp.m,function(data) {
+            eval(bquote(mgcv::gam(.(f1), data=data, family="binomial")))
+          })
+          
+          PS.m<-mapply(data=bootsp.m,model=PSmodel,function(data,model){
+            data$PS<-predict(model,newdata=data,type="response")
+            data
+          },SIMPLIFY=FALSE)
+        }
+        
+        message(">>>>>>>>STEP 2: PS estimation (GAM) sucessfully done")
+        message(">>>>>>>>STEP 3: CGPS estimation initiated")
+      }
+      ,
+      error=function(e) {e;message("PS estimation (GAM) failed: check the dataset and/or parameterization"); PSerror<<-1;CGPSerror<<-1},
+      warning=function(w) {w;message("PS estimation (GAM) may have failed: check the dataset and/or parameterization")}
+      )
+    }
     
-    message(">>>>>>>>STEP 2: PS estimation (GAM) sucessfully done")
-    message(">>>>>>>>STEP 3: CGPS estimation initiated")
-  }
-  ,
-  error=function(e) {e;message("PS estimation (GAM) failed: check the dataset and/or parameterization"); PSerror<<-1;CGPSerror<<-1},
-  warning=function(w) {w;message("PS estimation (GAM) may have failed: check the dataset and/or parameterization")}
-  )
-  }
-  
+
   if(PS.method=="xgboost") {
   tryCatch(expr={
     boost.fitdat<-data.matrix(dataset[,PS.formula])
@@ -294,12 +312,26 @@ estimateATT<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbu
     smd.m<-do.call("rbind",smd.m)
     correxp.m<-do.call("rbind",correxp.m)
     
+    total.exp.num<-lapply(bootsp,function(data){
+      nrow(data[data[,bexp]==exp.status,])
+    })
+    matched.exp.num<-lapply(findat,function(data){
+      length(unique(data[,"strata_matchdist"]))
+    })
+    total.exp.num<-do.call(rbind,total.exp.num)
+    matched.exp.num<-do.call(rbind,matched.exp.num)
+    
+    match.info<-data.frame(total.exp.N=total.exp.num,
+               matched.exp.N=matched.exp.num,
+               matched.percentage=matched.exp.num/total.exp.num*100)
+
+    
     
     rm(CGPSerror)
     rm(PSerror)
     end.time<-Sys.time()
     print(paste0("Elapsed time: ",round(end.time-start.time,3),attr(end.time-start.time,"units")))
-    return(list(summary.empirical=result,summary=result2,distribution=coefest,modelfit=modelfit,
+    return(list(match.info=match.info,summary.empirical=result,summary=result2,distribution=coefest,modelfit=modelfit,
                 smd.org=smd.org,smd.matched=colMeans(smd.m,na.rm=T),
                 correxp.org=correxp.org,correxp.matched=colMeans(correxp.m,na.rm=T),
                 smd.matched.bs=smd.m,correxp.matched.bs=correxp.m))
