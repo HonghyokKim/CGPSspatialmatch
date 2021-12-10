@@ -5,7 +5,7 @@
 #' @param bexp a character string indicating the name of the binary exposure variable. Use apostrophe like "VariableName"
 #' @param cexp a character string indicating the name of the continuous exposure variable. Use apostrophe like "VariableName"
 #' @param ps a character string indicating the name of propensity score. 
-#' @param model.exponly a regression model object that is a generlized propensity score regression model fitted using only exposed units.
+#' @param model.exponly a regression model object that is a generalized propensity score regression model fitted using only exposed units.
 #' @param exp.status the value indicating exposed units. Default is 1
 #' @param method a character string indicating the matching method used to conduct matching. Default is NULL. If NULL, only generalized propensity score is computed and matching is not done. Options include "nearest" (nearest neighbor matching) and "caliper" (caliper matching)
 #' @param caliper_bw a numeric vector indicating caliper bandwidth. Default is 0.1. If method is "nearest", this parameter is ignored.
@@ -59,6 +59,9 @@ cgpsmatch<-function(data,bexp,cexp,ps,model.exponly,expstatus=1,method=NULL,cali
     }
     if(method=="caliper") {
       result<-match.caliper(result,bexp,gpsname,caliper_bw)
+    }
+    if(method=="optimal") {
+      result<-match.optimal(result,bexp,gpsname,caliper_bw)
     }
   }
   if(replace==FALSE) {
