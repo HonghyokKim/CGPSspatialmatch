@@ -141,7 +141,7 @@ estimateATT<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbu
   if(PS.method=="xgboost") {
   tryCatch(expr={
     boost.fitdat<-data.matrix(distmatched[,PS.formula])
-    boost.dat<-xgboost::xgb.DMatrix(boost.fitdat, label = dataset[,bexp])
+    boost.dat<-xgboost::xgb.DMatrix(boost.fitdat, label = distmatched[,bexp])
     param <- list(max_depth = PS.max_depth, eta = PS.eta, nthread = PS.nthread,
                   objective = PS.objective, eval_metric = PS.eval_metric)
     PSmodel <- xgboost::xgb.train(param=param,boost.dat,nrounds=PS.nrounds)
@@ -168,7 +168,7 @@ estimateATT<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbu
   if(PS.method=="xgboost.cv") {
     tryCatch(expr={
       boost.fitdat<-data.matrix(distmatched[,PS.formula])
-      boost.dat<-xgboost::xgb.DMatrix(boost.fitdat, label = dataset[,bexp])
+      boost.dat<-xgboost::xgb.DMatrix(boost.fitdat, label = distmatched[,bexp])
       
       PSmodel <- CGPSspatialmatch::xgb.model.fit.cv(data=boost.dat,
                                                     cv.nround=PS.cv.nround,
