@@ -85,7 +85,7 @@ estimateATT<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbu
   PSerror<-0
   CGPSerror<-0
   
-  distmatched<-CGPSspatialmatch::matchdist(dataset,bexp,long=long,lat=lat,exp.status=exp.status,distbuf=distbuf,exp.included=FALSE,replace=FALSE)$matched.dataset
+  distmatched<-CGPSspatialmatch::matchdist(dataset,bexp,long=long,lat=lat,exp.status=exp.status,distbuf=distbuf,exp.included=TRUE,replace=FALSE)$matched.dataset
   
   if(bs.N>1) {
   bootsp<-replicate(bs.N,dplyr::sample_n(dataset,nrow(dataset),replace=bs.replace),simplify=FALSE)
