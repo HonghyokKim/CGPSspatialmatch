@@ -85,8 +85,6 @@ estimateATT<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbu
   PSerror<-0
   CGPSerror<-0
   
-  distmatched<-CGPSspatialmatch::matchdist(dataset,bexp,long=long,lat=lat,exp.status=exp.status,distbuf=distbuf,exp.included=TRUE,replace=FALSE)$matched.dataset
-  
   if(bs.N>1) {
   bootsp<-replicate(bs.N,dplyr::sample_n(dataset,nrow(dataset),replace=bs.replace),simplify=FALSE)
   }
@@ -108,7 +106,7 @@ estimateATT<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbu
         if(PS.method.data=="original") {
           f1 <- as.formula(
             paste(PS.formula))
-          PSmodel<-eval(bquote(mgcv::gam(.(f1), data=distmatched, family="binomial")))
+          PSmodel<-eval(bquote(mgcv::gam(.(f1), data=dataset, family="binomial")))
           PS.m<-lapply(bootsp.m,function(data){
             data$PS<-predict(PSmodel,newdata=data,type="response")
             data
@@ -140,8 +138,8 @@ estimateATT<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbu
 
   if(PS.method=="xgboost") {
   tryCatch(expr={
-    boost.fitdat<-data.matrix(distmatched[,PS.formula])
-    boost.dat<-xgboost::xgb.DMatrix(boost.fitdat, label = distmatched[,bexp])
+    boost.fitdat<-data.matrix(dataset[,PS.formula])
+    boost.dat<-xgboost::xgb.DMatrix(boost.fitdat, label = dataset[,bexp])
     param <- list(max_depth = PS.max_depth, eta = PS.eta, nthread = PS.nthread,
                   objective = PS.objective, eval_metric = PS.eval_metric)
     PSmodel <- xgboost::xgb.train(param=param,boost.dat,nrounds=PS.nrounds)
@@ -167,8 +165,8 @@ estimateATT<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbu
   
   if(PS.method=="xgboost.cv") {
     tryCatch(expr={
-      boost.fitdat<-data.matrix(distmatched[,PS.formula])
-      boost.dat<-xgboost::xgb.DMatrix(boost.fitdat, label = distmatched[,bexp])
+      boost.fitdat<-data.matrix(dataset[,PS.formula])
+      boost.dat<-xgboost::xgb.DMatrix(boost.fitdat, label = dataset[,bexp])
       
       PSmodel <- CGPSspatialmatch::xgb.model.fit.cv(data=boost.dat,
                                                     cv.nround=PS.cv.nround,
