@@ -31,22 +31,19 @@ cgpsmatch<-function(data,bexp,cexp,ps,model.exponly,expstatus=1,method=NULL,cali
   GPS_exponly <- dnorm(exponly[,cexp],mean=predict(model.exponly,newdata=exponly.pred),sd=sqrt(mean( (predict(model.exponly,newdata=exponly.pred)-exponly[,cexp])^2 )))
   GPS_exponly_Cstab <- dnorm(exponly[,cexp],mean=mean(exponly[,cexp],na.rm=T),sd=sd(exponly[,cexp],na.rm=T))
   
-  cf_unexposed <- sample(predict(model.exponly,newdata=unexponly.pred),nrow(unexponly.pred),replace=TRUE)
-  GPS_unexponly <- dnorm(cf_unexposed,mean=predict(model.exponly,newdata=unexponly.pred),sd=sqrt(mean( (predict(model.exponly,newdata=exponly.pred)-exponly[,cexp])^2 )))
-  GPS_unexponly_Cstab <- dnorm(cf_unexposed,mean=mean(cf_unexposed,na.rm=T),sd=sd(cf_unexposed,na.rm=T))
-  
+  GPS_unexponly_Cstab <- nrow(unexponly)/(nrow(unexponly)+nrow(exponly))
+    
   exponly[,paste0(cexp,"_cf")]<- exponly[,cexp]
   unexponly[,paste0(cexp,"_cf")]<- cf_unexposed
   
   gpsname<-paste0(ps,"_GPS")
   exponly[,gpsname]<-exponly[,ps]*GPS_exponly
-  unexponly[,gpsname]<-unexponly[,ps]*GPS_unexponly
+  unexponly[,gpsname]<-1-unexponly[,ps]
   
-  GPS_exponly_Bstab <- sum(exponly[,ps])/nrow(exponly)
-  GPS_unexponly_Bstab <- sum(unexponly[,ps])/nrow(unexponly)
+  GPS_exponly_Bstab <- nrow(exponly)/(nrow(unexponly)+nrow(exponly))
   
   exponly$weight<-  (1/exponly[,gpsname])*GPS_exponly_Cstab*GPS_exponly_Bstab
-  unexponly$weight<-  (1/unexponly[,gpsname])*GPS_unexponly_Cstab*GPS_unexponly_Bstab
+  unexponly$weight<-  (1/unexponly[,gpsname])*GPS_unexponly_Cstab
   
   exponly$weight <- ifelse(exponly$weight>weight.cutoff,weight.cutoff,exponly$weight)
   unexponly$weight <- ifelse(unexponly$weight>weight.cutoff,weight.cutoff,unexponly$weight)
