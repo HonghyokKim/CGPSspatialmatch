@@ -47,10 +47,10 @@ cgpsmatch<-function(data,bexp,cexp,ps,model.exponly,expstatus=1,method=NULL,cali
   # GPS_unexponly_Bstab <- sum(unexponly[,ps])/nrow(unexponly)
   # 
   GPS_exponly_Bstab <- nrow(exponly)/(nrow(unexponly)+nrow(exponly))
-  GPS_unexponly_Bstab <- nrow(unexponly)/(nrow(unexponly)+nrow(exponly))
+  #GPS_unexponly_Bstab <- nrow(unexponly)/(nrow(unexponly)+nrow(exponly))
   
   exponly$weight<-  (1/exponly[,gpsname])*GPS_exponly_Cstab*GPS_exponly_Bstab
-  unexponly$weight<-  (1/unexponly[,gpsname])*GPS_unexponly_Cstab*GPS_unexponly_Bstab
+  unexponly$weight<-  (1/unexponly[,gpsname])*GPS_unexponly_Cstab*GPS_exponly_Bstab ## IMPORTANT!
   
   exponly$weight <- ifelse(exponly$weight>weight.cutoff,weight.cutoff,exponly$weight)
   unexponly$weight <- ifelse(unexponly$weight>weight.cutoff,weight.cutoff,unexponly$weight)
