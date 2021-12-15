@@ -16,6 +16,7 @@
 #' cgpsmatch()
 
 cgpsmatch<-function(data,bexp,cexp,ps,model.exponly,expstatus=1,method=NULL,caliper_bw=0.1,replace=TRUE,weight.cutoff=10) {
+
   exponly <- data[data[,bexp]==expstatus,]
   unexponly <- data[data[,bexp] != expstatus,]
   
@@ -31,14 +32,31 @@ cgpsmatch<-function(data,bexp,cexp,ps,model.exponly,expstatus=1,method=NULL,cali
   GPS_exponly <- dnorm(exponly[,cexp],mean=predict(model.exponly,newdata=exponly.pred),sd=sqrt(mean( (predict(model.exponly,newdata=exponly.pred)-exponly[,cexp])^2 )))
   GPS_exponly_Cstab <- dnorm(exponly[,cexp],mean=mean(exponly[,cexp],na.rm=T),sd=sd(exponly[,cexp],na.rm=T))
   
- #cf_unexposed <- rnorm(nrow(unexponly.pred),mean=predict(model.exponly,newdata=unexponly.pred),sd=sqrt(mean( (predict(model.exponly,newdata=exponly.pred)-exponly[,cexp])^2)) )
-  cf_unexposed <- predict(model.exponly,newdata=unexponly.pred)+rnorm(nrow(unexponly.pred),mean=0,sd=sqrt(mean( (predict(model.exponly,newdata=exponly.pred)-exponly[,cexp])^2 )))
-  GPS_unexponly <- dnorm(cf_unexposed,mean=predict(model.exponly,newdata=unexponly.pred),sd=sqrt(mean( (predict(model.exponly,newdata=exponly.pred)-exponly[,cexp])^2 )))
-  #GPS_unexponly_Cstab <- dnorm(cf_unexposed,mean=mean(cf_unexposed,na.rm=T),sd=sd(cf_unexposed,na.rm=T))
+ # #cf_unexposed <- rnorm(nrow(unexponly.pred),mean=predict(model.exponly,newdata=unexponly.pred),sd=sqrt(mean( (predict(model.exponly,newdata=exponly.pred)-exponly[,cexp])^2)) )
+ #  cf_unexposed <- predict(model.exponly,newdata=unexponly.pred)+rnorm(nrow(unexponly.pred),mean=0,sd=sqrt(mean( (predict(model.exponly,newdata=exponly.pred)-exponly[,cexp])^2 )))
+ #  GPS_unexponly <- dnorm(cf_unexposed,mean=predict(model.exponly,newdata=unexponly.pred),sd=sqrt(mean( (predict(model.exponly,newdata=exponly.pred)-exponly[,cexp])^2 )))
+
+  
+  
+  GPS_unexponlyset<-lapply(as.list(exponly[,cexp]),FUN=function(data) {
+    dnorm(data,mean=predict(model.exponly,newdata=unexponly.pred),sd=sqrt(mean( (predict(model.exponly,newdata=exponly.pred)-exponly[,cexp])^2 )))
+  })
+  unexposedGPSset<-data.frame(do.call(cbind,GPS_unexponlyset))
+  colnames(unexposedGPSset)<-paste0("UnexpGPSset_",seq(unique(unexponly$strata_matchdist)))
+  unexposedGPSset<-cbind(unexponly$strata_matchdist,unexposedGPSset)
+  exposedGPS<-exposed[,c("strata_matchdist","PS_GPS")]
+  colnames(unexposedGPSset)[1]<-"strata_matchdist"
+  
+  cf_unexposed<-unlist(lapply(unexposedGPSset$strata_matchdist,FUN=function(ge) {exponly[exponly$strata_matchdist==ge,cexp]}))
+  GPS_unexponly<-unlist(lapply(unique(unexposedGPSset$strata_matchdist), function(select) {unexposedGPSset[unexposedGPSset$strata_matchdist==select,
+                                                                                                           paste0("UnexpGPSset_",select)]}))
+  
+  
+  #  #GPS_unexponly_Cstab <- dnorm(cf_unexposed,mean=mean(cf_unexposed,na.rm=T),sd=sd(cf_unexposed,na.rm=T))
   GPS_unexponly_Cstab <- dnorm(cf_unexposed,mean=mean(predict(model.exponly,newdata=unexponly.pred)),
                                sd= sqrt(var(predict(model.exponly,newdata=unexponly.pred))+
-                                 mean( (predict(model.exponly,newdata=exponly.pred)-exponly[,cexp])^2 ) )
-                                 )
+                                          mean( (predict(model.exponly,newdata=exponly.pred)-exponly[,cexp])^2 ) )
+  )
   
   exponly[,paste0(cexp,"_cf")]<- exponly[,cexp]
   unexponly[,paste0(cexp,"_cf")]<- cf_unexposed
