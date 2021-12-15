@@ -44,7 +44,6 @@ cgpsmatch<-function(data,bexp,cexp,ps,model.exponly,expstatus=1,method=NULL,cali
   unexposedGPSset<-data.frame(do.call(cbind,GPS_unexponlyset))
   colnames(unexposedGPSset)<-paste0("UnexpGPSset_",seq(unique(unexponly$strata_matchdist)))
   unexposedGPSset<-cbind(unexponly$strata_matchdist,unexposedGPSset)
-  exposedGPS<-exponly[,c("strata_matchdist","PS_GPS")]
   colnames(unexposedGPSset)[1]<-"strata_matchdist"
   
   cf_unexposed<-unlist(lapply(unexposedGPSset$strata_matchdist,FUN=function(ge) {exponly[exponly$strata_matchdist==ge,cexp]}))
