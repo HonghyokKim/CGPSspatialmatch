@@ -42,7 +42,7 @@ cgpsmatch<-function(data,bexp,cexp,ps,model.exponly,expstatus=1,method=NULL,cali
     dnorm(data,mean=predict(model.exponly,newdata=unexponly.pred),sd=sqrt(mean( (predict(model.exponly,newdata=exponly.pred)-exponly[,cexp])^2 )))
   })
   unexposedGPSset<-data.frame(do.call(cbind,GPS_unexponlyset))
-  colnames(unexposedGPSset)<-paste0("UnexpGPSset_",seq(unique(unexponly$strata_matchdist)))
+  colnames(unexposedGPSset)<-paste0("UnexpGPSset_",unique(unexponly$strata_matchdist))
   unexposedGPSset<-cbind(unexponly$strata_matchdist,unexposedGPSset)
   colnames(unexposedGPSset)[1]<-"strata_matchdist"
   
