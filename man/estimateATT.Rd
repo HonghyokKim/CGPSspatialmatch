@@ -6,6 +6,7 @@
 \usage{
 estimateATT(
   dataset,
+  PSdataset,
   bexp,
   exp.status = 1,
   cexp,
@@ -39,6 +40,7 @@ estimateATT(
   PS.cv.lambda = c(0),
   PS.cv.lambda_bias = c(0),
   PS.cv.alpha = c(0),
+  PS.cv.scale_pos_weight = 1,
   PS.cv.local.N = 10,
   CGPS.method = "mgcv.GAM",
   CGPS.formula,
@@ -64,6 +66,7 @@ estimateATT(
   CGPS.cv.lambda = c(0),
   CGPS.cv.lambda_bias = c(0),
   CGPS.cv.alpha = c(0),
+  CGPS.cv.scale_pos_weight = 1,
   CGPS.cv.local.N = 10,
   smethod = "nearest",
   caliper_bw = NULL,
@@ -79,6 +82,8 @@ estimateATT(
 }
 \arguments{
 \item{dataset}{a dataset object.}
+
+\item{PSdataset}{a dataset for PS estimation.}
 
 \item{bexp}{a character string indicating the name of the binary exposure. Use apostrophe like "VariableName"}
 
