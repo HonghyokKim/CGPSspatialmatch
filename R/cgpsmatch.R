@@ -85,7 +85,7 @@ cgpsmatch<-function(data,bexp,cexp,ps,model.exponly,expstatus=1,method=NULL,cali
       result<-match.caliper(result,bexp,gpsname,caliper_bw)
     }
     if(method=="nearestcaliper") {
-      result<-match.nearestcaliper(result,bexp,gpsname,caliper_bw)
+      result<-match.nearestcaliper(result,bexp,gpsname,caliper_bw,replace2=replace)
     }
   }
   if(replace==FALSE) {

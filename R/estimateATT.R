@@ -2,6 +2,7 @@
 #'
 #' This function matches exposed units and unexposed units by a pre-specified buffer distance (Euclidean distance)
 #' @param dataset a dataset object.
+#' @param PSdataset a dataset for PS estimation.
 #' @param bexp a character string indicating the name of the binary exposure. Use apostrophe like "VariableName"
 #' @param exp.status a numeric vector indicating the value indicating exposed units. Defalut=1
 #' @param cexp a character string indicating the name of the continuous exposure. Use apostrophe like "VariableName"
@@ -66,7 +67,7 @@
 #' @examples 
 #' estimateATT()
 
-estimateATT<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbuf=0.1,exp.included=FALSE,long,lat,
+estimateATT<-function(dataset,PSdataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbuf=0.1,exp.included=FALSE,long,lat,
                      PS.method="mgcv.GAM",
                      PS.method.data="original",
                      PS.formula,
@@ -109,7 +110,7 @@ estimateATT<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbu
         if(PS.method.data=="original") {
           f1 <- as.formula(
             paste(PS.formula))
-          PSmodel<-eval(bquote(mgcv::gam(.(f1), data=dataset, family="binomial")))
+          PSmodel<-eval(bquote(mgcv::gam(.(f1), data=PSdataset, family="binomial")))
           PS.m<-lapply(bootsp.m,function(data){
             data$PS<-predict(PSmodel,newdata=data,type="response")
             data
@@ -120,7 +121,7 @@ estimateATT<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbu
           f1 <- as.formula(
             paste0(PS.formula,"+as.factor(strata_matchdist)"))
           PSmodel<-lapply(bootsp.m,function(data) {
-            eval(bquote(mgcv::gam(.(f1), data=data, family="binomial")))
+            eval(bquote(mgcv::gam(.(f1), data=PSdataset, family="binomial")))
           })
           
           PS.m<-mapply(data=bootsp.m,model=PSmodel,function(data,model){
@@ -141,8 +142,8 @@ estimateATT<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbu
 
   if(PS.method=="xgboost") {
   tryCatch(expr={
-    boost.fitdat<-data.matrix(dataset[,PS.formula])
-    boost.dat<-xgboost::xgb.DMatrix(boost.fitdat, label = dataset[,bexp])
+    boost.fitdat<-data.matrix(PSdataset[,PS.formula])
+    boost.dat<-xgboost::xgb.DMatrix(boost.fitdat, label = PSdataset[,bexp])
     param <- list(max_depth = PS.max_depth, eta = PS.eta, nthread = PS.nthread,
                   objective = PS.objective, eval_metric = PS.eval_metric)
     PSmodel <- xgboost::xgb.train(param=param,boost.dat,nrounds=PS.nrounds)
@@ -168,8 +169,8 @@ estimateATT<-function(dataset,bexp,exp.status=1,cexp,fmethod.replace=TRUE,distbu
   
   if(PS.method=="xgboost.cv") {
     tryCatch(expr={
-      boost.fitdat<-data.matrix(dataset[,PS.formula])
-      boost.dat<-xgboost::xgb.DMatrix(boost.fitdat, label = dataset[,bexp])
+      boost.fitdat<-data.matrix(PSdataset[,PS.formula])
+      boost.dat<-xgboost::xgb.DMatrix(boost.fitdat, label = PSdataset[,bexp])
       
       PSmodel <- xgb.model.fit.cv(data=boost.dat,
                                                     cv.nround=PS.cv.nround,

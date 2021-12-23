@@ -30,14 +30,32 @@ match.nearestcaliper <-function(data,bexp,gpsname,caliper_bw,exp.status=1,index.
   selected<-matched.units %>% 
     group_by(strata_matchdist) %>% 
     slice(which.min(GPSdiff))
+  if(replace2==FALSE) {
+    selected.nonreplace<-selected[1,]
+    selected.FID<-selected[1,"FID"]
+    matched.units<-matched.units[matched.units[,"FID"] %!in% selected.FID,]
+    matched.units<-matched.units[matched.units[,"strata_matchdist"] != 1,]
+    for (ii in seq(2,num_exp)) {
+      ss<-matched.units %>%
+        group_by(strata_matchdist) %>%
+        slice(which.min(GPSdiff))
+      selected.nonreplace<-rbind(selected.nonreplace,ss[1,])
+      selected.FID<-ss[1,"FID"]
+      matched.units<-matched.units[matched.units[,"FID"] %!in% selected.FID,]
+      matched.units<-matched.units[matched.units[,"strata_matchdist"] != ii,]
+    }
+    selected<-selected.nonreplace
+  }
   
   data<-rbind(index.units,selected)
+  
   
   check<-table(data[,c("strata_matchdist","index")])
   if(ncol(check) !=2) {
     result<-NULL
   }
   else {
+    
     
     data<-data[data[,"strata_matchdist"] %!in% as.numeric(names(check[,1][check[,1]==0])),]
     matched.units.exist<-as.numeric(check[,as.numeric(colnames(check)) != 1])
