@@ -21,7 +21,7 @@ estimateATT(
   PS.max_depth = 5,
   PS.eta = 0.1,
   PS.nthread = 1,
-  PS.eval_metric = "auc",
+  PS.eval_metric = "logloss",
   PS.objective = "binary:logistic",
   PS.nrounds = 50,
   PS.cv.nround = 100,
@@ -34,7 +34,7 @@ estimateATT(
   PS.cv.gamma = c(0),
   PS.cv.nthread = 1,
   PS.cv.subsample = 1,
-  PS.cv.eval_metric = "auc",
+  PS.cv.eval_metric = "logloss",
   PS.cv.colsample_bytree = 1,
   PS.cv.min_child_weight = 1,
   PS.cv.lambda = c(0),
@@ -71,13 +71,13 @@ estimateATT(
   smethod = "nearest",
   caliper_bw = NULL,
   smethod.replace = FALSE,
-  weight.cutoff = 10,
   formulaDisease,
   family,
   bs.N,
   bs.replace = TRUE,
+  corrmethod = "Pearson",
   varilist,
-  corrmethod = "Pearson"
+  modelinfo = FALSE
 )
 }
 \arguments{
@@ -91,7 +91,7 @@ estimateATT(
 
 \item{cexp}{a character string indicating the name of the continuous exposure. Use apostrophe like "VariableName"}
 
-\item{fmethod.replace}{an indicator of whether matching by distance is done with replacement. Default=TRUE. If FALSE, matching is done without replacement. If FALSE, note that the output of this function may differ by the order of observation units in the original dataset.}
+\item{fmethod.replace}{an indicator of whether one-to-n distance-matching will be performed with replacement or without replacement. Default=TRUE. If FALSE, matching is done without replacement, which of the performance has not been tested. If FALSE, note that the output of this function may differ by the order of observation units in the original dataset.}
 
 \item{distbuf}{a numeric vector indicating the buffer distance by which exposed units and unexposed units are matched}
 
@@ -105,93 +105,107 @@ estimateATT(
 
 \item{PS.formula}{a character string indicating the formula of propensity score estimation. For PSmethod="mgcv.GAM", this string must be like "the binary exposure variable ~ variableA+variableB+variableC+s(long,lat)". For PSmethod="xgboost", this must be a vector like c("variableA", "variableB", "variableC", "long", "lat")}
 
-\item{PS.max_depth}{(xgboost only) a numeric vector indicating maximum depth of a tree. Default=5}
+\item{PS.max_depth}{(xgboost only) a numeric vector indicating maximum depth of a tree. Default=5. This is a wrapper for xgboost::xgb.train. See https://xgboost.readthedocs.io/en/latest/parameter.html}
 
-\item{PS.eta}{(xgboost only) a numeric vector indicating the learning rate. Default=0.1}
+\item{PS.eta}{(xgboost only) a numeric vector indicating the learning rate. Default=0.1. This is a wrapper for xgboost::xgb.train. See https://xgboost.readthedocs.io/en/latest/parameter.html}
 
-\item{PS.nthread}{(xgboost only) a numeric vector indicating the number of thread. Default=1. See xgb.train}
+\item{PS.nthread}{(xgboost only) a numeric vector indicating the number of thread. Default=1. This is a wrapper for xgboost::xgb.train. See https://xgboost.readthedocs.io/en/latest/parameter.html}
 
-\item{PS.eval_metric}{(xgboost only) a character string indicating evaluation metrics for validation data. Default="auc". See xgb.train}
+\item{PS.eval_metric}{(xgboost only) a character string indicating evaluation metrics for validation data. Default="logloss". This is a wrapper for xgboost::xgb.train. See https://xgboost.readthedocs.io/en/latest/parameter.html}
 
-\item{PS.objective}{(xgboost only) a character string indicating the objective function. Default="binary:logistic". See xgb.train}
+\item{PS.objective}{(xgboost only) a character string indicating the objective function. Default="binary:logistic". This is a wrapper for xgboost::xgb.train. See https://xgboost.readthedocs.io/en/latest/parameter.html}
 
-\item{PS.nrounds}{(xgboost only) a numeric vector indicating the number of rounds. Default=100. See xgb.train.}
+\item{PS.nrounds}{(xgboost only) a numeric vector indicating the number of rounds. Default=100. This is a wrapper for xgboost::xgb.train. See https://xgboost.readthedocs.io/en/latest/parameter.html}
 
-\item{PS.cv.nround}{(xgboost.cv only) a numeric vector indicating the maximum number of rounds.}
+\item{PS.cv.nround}{(xgboost.cv only) a numeric vector indicating the maximum number of rounds. This is a wrapper for xgboost::xgb.train. See https://xgboost.readthedocs.io/en/latest/parameter.html}
 
-\item{PS.cv.nfold}{(xgboost.cv only) a numeric vector indicating N-fold cross-validation.}
+\item{PS.cv.nfold}{(xgboost.cv only) a numeric vector indicating N-fold cross-validation. This is a wrapper for xgboost::xgb.train. See https://xgboost.readthedocs.io/en/latest/parameter.html}
 
 \item{PS.cv.min.burnin}{(xgboost.cv only) a numeric vector indicating the minimum number of rounds. Default=99, which indicates the minimum number of rounds is 100. This must be smaller than PS.early_stopping_rounds.}
 
 \item{PS.early_stopping_rounds}{(xgboost.cv only) a numeric vector indicating when xgboost stops. If the evaluation metric did not decrease until when (code)PS.early_stopping_rounds, xgboost stops. This saves time. Default=100.}
 
-\item{PS.cv.objective}{(xgboost.cv only) a character string indicating the objective function. Default="binary:logistic" See xgb.train}
+\item{PS.cv.objective}{(xgboost.cv only) a character string indicating the objective function. Default="binary:logistic" This is a wrapper for xgboost::xgb.train. See https://xgboost.readthedocs.io/en/latest/parameter.html}
 
-\item{PS.cv.max_depth}{(xgboost.cv only) a numeric vector indicating maximum depth of a tree.}
+\item{PS.cv.max_depth}{(xgboost.cv only) a numeric vector indicating maximum depth of a tree. This is a wrapper for xgboost::xgb.train. See https://xgboost.readthedocs.io/en/latest/parameter.html}
 
-\item{PS.cv.eta}{(xgboost.cv only) a numeric vector indicating the learning rate.}
+\item{PS.cv.eta}{(xgboost.cv only) a numeric vector indicating the learning rate. This is a wrapper for xgboost::xgb.train. See https://xgboost.readthedocs.io/en/latest/parameter.html}
 
-\item{PS.cv.nthread}{(xgboost.cv only) a numeric vector indicating the number of thread. See xgb.train}
+\item{PS.cv.nthread}{(xgboost.cv only) a numeric vector indicating the number of thread. This is a wrapper for xgboost::xgb.train. See https://xgboost.readthedocs.io/en/latest/parameter.html}
 
-\item{PS.cv.subsample}{(xgboost.cv only) a numeric vector indicating subsample ratio of the training instance. Default=0.5. See xgb.train}
+\item{PS.cv.subsample}{(xgboost.cv only) a numeric vector indicating subsample ratio of the training instance. Default=0.5. This is a wrapper for xgboost::xgb.train. See https://xgboost.readthedocs.io/en/latest/parameter.html}
 
-\item{PS.cv.eval_metric}{(xgboost.cv only) a character string indicating evaluation metrics for validation data. Default="auc". See xgb.train}
+\item{PS.cv.eval_metric}{(xgboost.cv only) a character string indicating evaluation metrics for validation data. Default="logloss". This is a wrapper for xgboost::xgb.train. See https://xgboost.readthedocs.io/en/latest/parameter.html}
 
-\item{PS.cv.colsample_bytree}{(xgboost.cv only) a numeric vector indicating subsample ratio of columns when constructing each tree. Default=1. See. xgb.train}
+\item{PS.cv.colsample_bytree}{(xgboost.cv only) a numeric vector indicating subsample ratio of columns when constructing each tree. Default=1. This is a wrapper for xgboost::xgb.train. See https://xgboost.readthedocs.io/en/latest/parameter.html}
 
-\item{PS.cv.min_child_weight}{(xgboost.cv only) Default=1. See. xgb.train}
+\item{PS.cv.min_child_weight}{(xgboost.cv only) Default=1. This is a wrapper for xgboost::xgb.train. See https://xgboost.readthedocs.io/en/latest/parameter.html}
 
-\item{PS.cv.local.N}{(xgboost.cv only) a numeric vector indicating how many times xgboost will search (local) mini-ma of the evaluation metric function. Default=10}
+\item{PS.cv.lambda}{(xgboost.cv only) L2 Regularization term on weights. Default=0. This is a wrapper for xgboost::xgb.train. See https://xgboost.readthedocs.io/en/latest/parameter.html}
+
+\item{PS.cv.lambda_bias}{(xgboost.cv only) L2 Regularization term on bias. Default=0. This is a wrapper for xgboost::xgb.train. See https://xgboost.readthedocs.io/en/latest/parameter.html}
+
+\item{PS.cv.alpha}{(xgboost.cv only) L1 Regularization term on weights. Default=0. This is a wrapper for xgboost::xgb.train. See https://xgboost.readthedocs.io/en/latest/parameter.html}
+
+\item{PS.cv.scale_pos_weight}{(xgboost.cv only) Default=1. This is a wrapper for xgboost::xgb.train. See https://xgboost.readthedocs.io/en/latest/parameter.html}
+
+\item{PS.cv.local.N}{(xgboost.cv only) a numeric vector indicating how many times xgboost will search (local) mini-ma of the evaluation metric function. Default=10.}
 
 \item{CGPS.method}{a character string or a vector of variable names, indicating the method of conditional propensity score estimation. Options include "mgcv.GAM", "xgboost", and "xgboost.cv". Default="mgcv.GAM".}
 
-\item{CGPS.formula}{a character string indicating the formula of conditional generalized propensity score estimation}
+\item{CGPS.formula}{a character string indicating the formula of conditional generalized propensity score estimation.}
 
-\item{CGPS.max_depth}{(xgboost only) a numeric vector indicating maximum depth of a tree. Default=5}
+\item{CGPS.max_depth}{(xgboost only) a numeric vector indicating maximum depth of a tree. Default=5. This is a wrapper for xgboost::xgb.train. See https://xgboost.readthedocs.io/en/latest/parameter.html}
 
-\item{CGPS.eta}{(xgboost only) a numeric vector indicating the learning rate. Default=0.1}
+\item{CGPS.eta}{(xgboost only) a numeric vector indicating the learning rate. Default=0.1. This is a wrapper for xgboost::xgb.train. See https://xgboost.readthedocs.io/en/latest/parameter.html}
 
-\item{CGPS.nthread}{(xgboost only) a numeric vector indicating the number of thread. Default=1. See xgb.train}
+\item{CGPS.nthread}{(xgboost only) a numeric vector indicating the number of thread. Default=1. This is a wrapper for xgboost::xgb.train. See https://xgboost.readthedocs.io/en/latest/parameter.html}
 
-\item{CGPS.eval_metric}{(xgboost only) a character string indicating evaluation metrics for validation data. Default="rmse". See xgb.train}
+\item{CGPS.eval_metric}{(xgboost only) a character string indicating evaluation metrics for validation data. Default="rmse". This is a wrapper for xgboost::xgb.train. See https://xgboost.readthedocs.io/en/latest/parameter.html}
 
-\item{CGPS.objective}{(xgboost only) a character string indicating the objective function. Default="reg:squarederror". See xgb.train}
+\item{CGPS.objective}{(xgboost only) a character string indicating the objective function. Default="reg:squarederror". This is a wrapper for xgboost::xgb.train. See https://xgboost.readthedocs.io/en/latest/parameter.html}
 
-\item{CGPS.nrounds}{(xgboost only) a numeric vector indicating the number of rounds. Default=100. See xgb.train.}
+\item{CGPS.nrounds}{(xgboost only) a numeric vector indicating the number of rounds. Default=100. This is a wrapper for xgboost::xgb.train. See https://xgboost.readthedocs.io/en/latest/parameter.html}
 
-\item{CGPS.cv.nround}{(xgboost.cv only) a numeric vector indicating the maximum number of rounds.}
+\item{CGPS.cv.nround}{(xgboost.cv only) a numeric vector indicating the maximum number of rounds. This is a wrapper for xgboost::xgb.train. See https://xgboost.readthedocs.io/en/latest/parameter.html}
 
-\item{CGPS.cv.nfold}{(xgboost.cv only) a numeric vector indicating N-fold cross-validation.}
+\item{CGPS.cv.nfold}{(xgboost.cv only) a numeric vector indicating N-fold cross-validation. This is a wrapper for xgboost::xgb.train. See https://xgboost.readthedocs.io/en/latest/parameter.html}
 
 \item{CGPS.cv.min.burnin}{(xgboost.cv only) a numeric vector indicating the minimum number of rounds. Default=99, which indicates the minimum number of rounds is 100. This must be smaller than PS.early_stopping_rounds.}
 
 \item{CGPS.early_stopping_rounds}{(xgboost.cv only) a numeric vector indicating when xgboost stoCGPS. If the evaluation metric did not decrease until when (code)CGPS.early_stopping_rounds, xgboost stops This saves time. Default=100.}
 
-\item{CGPS.cv.objective}{(xgboost.cv only) a character string indicating the objective function. Default="binary:logistic" See xgb.train}
+\item{CGPS.cv.objective}{(xgboost.cv only) a character string indicating the objective function. Default="binary:logistic". This is a wrapper for xgboost::xgb.train. See https://xgboost.readthedocs.io/en/latest/parameter.html}
 
-\item{CGPS.cv.max_depth}{(xgboost.cv only) a numeric vector indicating maximum depth of a tree.}
+\item{CGPS.cv.max_depth}{(xgboost.cv only) a numeric vector indicating maximum depth of a tree. This is a wrapper for xgboost::xgb.train. See https://xgboost.readthedocs.io/en/latest/parameter.html}
 
-\item{CGPS.cv.eta}{(xgboost.cv only) a numeric vector indicating the learning rate.}
+\item{CGPS.cv.eta}{(xgboost.cv only) a numeric vector indicating the learning rate. This is a wrapper for xgboost::xgb.train. See https://xgboost.readthedocs.io/en/latest/parameter.html}
 
-\item{CGPS.cv.nthread}{(xgboost.cv only) a numeric vector indicating the number of thread. Default=1. See xgb.train}
+\item{CGPS.cv.nthread}{(xgboost.cv only) a numeric vector indicating the number of thread. Default=1. This is a wrapper for xgboost::xgb.train. See https://xgboost.readthedocs.io/en/latest/parameter.html}
 
-\item{CGPS.cv.subsample}{(xgboost.cv only) a numeric vector indicating subsample ratio of the training instance. See xgb.train}
+\item{CGPS.cv.subsample}{(xgboost.cv only) a numeric vector indicating subsample ratio of the training instance. This is a wrapper for xgboost::xgb.train. See https://xgboost.readthedocs.io/en/latest/parameter.html}
 
-\item{CGPS.cv.eval_metric}{(xgboost.cv only) a character string indicating evaluation metrics for validation data. Default="auc". See xgb.train}
+\item{CGPS.cv.eval_metric}{(xgboost.cv only) a character string indicating evaluation metrics for validation data. Default="rmse". This is a wrapper for xgboost::xgb.train. See https://xgboost.readthedocs.io/en/latest/parameter.html}
 
-\item{CGPS.cv.colsample_bytree}{(xgboost.cv only) a numeric vector indicating subsample ratio of columns when constructing each tree. Default=1. See. xgb.train}
+\item{CGPS.cv.colsample_bytree}{(xgboost.cv only) a numeric vector indicating subsample ratio of columns when constructing each tree. Default=1. This is a wrapper for xgboost::xgb.train. See https://xgboost.readthedocs.io/en/latest/parameter.html}
 
-\item{CGPS.cv.min_child_weight}{(xgboost.cv only) Default=1. See. xgb.train}
+\item{CGPS.cv.min_child_weight}{(xgboost.cv only) Default=1. This is a wrapper for xgboost::xgb.train. See https://xgboost.readthedocs.io/en/latest/parameter.html}
+
+\item{CGPS.cv.lambda}{(xgboost.cv only) L2 Regularization term on weights. Default=0. This is a wrapper for xgboost::xgb.train. See https://xgboost.readthedocs.io/en/latest/parameter.html}
+
+\item{CGPS.cv.lambda_bias}{(xgboost.cv only) L2 Regularization term on bias. Default=0. This is a wrapper for xgboost::xgb.train. See https://xgboost.readthedocs.io/en/latest/parameter.html}
+
+\item{CGPS.cv.alpha}{(xgboost.cv only) L1 Regularization term on weights. Default=0. This is a wrapper for xgboost::xgb.train. See https://xgboost.readthedocs.io/en/latest/parameter.html}
+
+\item{CGPS.cv.scale_pos_weight}{(xgboost.cv only) Default=1. This is a wrapper for xgboost::xgb.train. See https://xgboost.readthedocs.io/en/latest/parameter.html}
 
 \item{CGPS.cv.local.N}{(xgboost.cv only) a numeric vector indicating how many times xgboost will search (local) mini-ma of the evaluation metric function. Default=10}
 
-\item{smethod}{method a character string indicating the matching method used to conduct matching by GCGPS. Default="caliper". Options include "nearest" (nearest neighbor matching) and "caliper" (caliper matching)}
+\item{smethod}{method a character string indicating the matching method used to conduct matching by GPS Default="nearest". Options include "nearest" (nearest neighbor matching), "nearestcaliper" (nearest neighbor caliper matching), "caliper" (caliper matching)}
 
 \item{caliper_bw}{a numeric vector indicating caliper bandwidth. Default=0.1. If method is "nearest", this parameter is ignored.}
 
-\item{smethod.replace}{an indicator of whether matching by GPS is done with replacement. Default=TRUE. If FALSE, matching is done without replacement. If FALSE, note that the output of this function may differ by the order of observation units in the original dataset.}
-
-\item{weight.cutoff}{a numeric vector indicating the cutoff value of the weight. Default=10.}
+\item{smethod.replace}{an indicator of whether matching by GPS is done with replacement. Default=FALSE. If FALSE, matching is done without replacement. If FALSE, note that the output of this function may differ by the order of observation units in the original dataset. Note: Matching with replacement has not been tested for its performance.}
 
 \item{formulaDisease}{a character string indicating the formula of the disease model.}
 
@@ -201,9 +215,9 @@ estimateATT(
 
 \item{bs.replace}{a character string indicating whether bootstrapping is done with replacement. Default=TRUE.}
 
-\item{varilist}{a character vector indicating variable names for which you wish to compute standardized mean difference. List variable names as a vector like c("VariableA","VariableB")}
+\item{corrmethod}{a character string indicating which correlation coefficient is to be computed. These include "Pearson" (default), "Spearman", "Polychoric", or "Polyserial". For tetrachoric use "Polychoric" and for biserial use "Polyserial". This is a wrapper for wCorr::weightedCorr}
 
-\item{corrmethod}{a character string indicating which correlation coefficient is to be computed. These include "Pearson" (default), "Spearman", "Polychoric", or "Polyserial". For tetrachoric use "Polychoric" and for biserial use "Polyserial". This relies on wCorr::weightedCorr}
+\item{varilist}{a character vector indicating variable names for which you wish to compute standardized mean difference. List variable names as a vector like c("VariableA","VariableB")}
 }
 \description{
 This function matches exposed units and unexposed units by a pre-specified buffer distance (Euclidean distance)

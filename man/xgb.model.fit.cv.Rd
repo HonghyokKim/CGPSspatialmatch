@@ -21,6 +21,7 @@ xgb.model.fit.cv(
   cv.lambda,
   cv.lambda_bias,
   cv.alpha,
+  cv.scale_pos_weight,
   early_stopping_rounds,
   cv.local.N
 )
