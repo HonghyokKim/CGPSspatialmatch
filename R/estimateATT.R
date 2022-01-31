@@ -337,7 +337,6 @@ estimateATT<-function(dataset,PSdataset,bexp,exp.status=1,cexp,fmethod.replace=T
     correxp.org<-correxp(dataset,bexp,cexp,exp.status=exp.status,varinames=varilist,method=corrmethod)
     smd.m<-lapply(findat,function(data) {smd(data,bexp,exp.status=exp.status,varinames=varilist)})
     smd.m<-do.call("rbind",smd.m)
-    correxp.m<-do.call("rbind",correxp.m)
     
     total.exp.num<-lapply(bootsp,function(data){
       nrow(data[data[,bexp]==exp.status,])
