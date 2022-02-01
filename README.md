@@ -20,8 +20,6 @@ For other designs such as longitudinal design and cohort design with survival an
 2) use functions for distance-matching, GPS estimation, and GPS matching (DIY)
 
 
-Mannuals for each of functions will be doccumentized.
-
 Wrapper functions for longitudinal and survival data with Cox models and mixed effect models will be developed in the future.
 
 Error reporting and questions: 
