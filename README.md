@@ -1,5 +1,5 @@
-# CGPSspatialmatch
-This is a R package, CGPSspatialmatch.
+# CGPSspatialmatch Version 1
+This is a R package, CGPSspatialmatch
 
 Each function in CGPSspatialmatch has a docummentation.
 
