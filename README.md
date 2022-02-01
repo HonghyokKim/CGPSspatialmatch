@@ -17,7 +17,7 @@ For other designs such as longitudinal design and cohort design with survival an
 
 1) transform data to fit in like cross-sectional analysis.
 
-2) use each of functions for distacne-matching, GPS estimation, and GPS matching.
+2) use functions for distance-matching, GPS estimation, and GPS matching (DIY)
 
 
 Mannuals for each of functions will be doccumentized.
