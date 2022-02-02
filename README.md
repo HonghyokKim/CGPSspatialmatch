@@ -7,7 +7,6 @@ To install this,
 devtools::install_github('HonghyokKim/CGPSspatialmatch')
 
 
-Each function in CGPSspatialmatch has documentation.
 
 
 You may want to use SampleCode.R in the "SampleCode" folder. Notes are appended for each of the lines.
