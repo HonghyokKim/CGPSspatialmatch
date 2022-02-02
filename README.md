@@ -1,12 +1,7 @@
 # CGPSspatialmatch Version 1
 This is an R package, CGPSspatialmatch
 
-To install this, 
-##install.packages("devtools")
-
-devtools::install_github('HonghyokKim/CGPSspatialmatch')
-
-
+To install this in R, devtools::install_github('HonghyokKim/CGPSspatialmatch')
 
 
 You may want to use SampleCode.R in the "SampleCode" folder. Notes are appended for each of the lines.
