@@ -1,6 +1,12 @@
 # CGPSspatialmatch Version 1
 This is an R package, CGPSspatialmatch
 
+To install this, 
+##install.packages("devtools")
+
+devtools::install_github('HonghyokKim/CGPSspatialmatch')
+
+
 Each function in CGPSspatialmatch has documentation.
 
 
