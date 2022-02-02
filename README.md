@@ -20,7 +20,7 @@ For other designs such as longitudinal design and cohort design with survival an
 
 2) use functions for distance-matching, GPS estimation, and GPS matching in this package.
 
-"EstimateATT" function  will be developed to include longitudinal and survival data with Cox models and mixed effect models in the future.
+"estimateATT" function  will be developed to include longitudinal and survival data with Cox models and mixed effect models in the future.
 
 Error reporting and questions: 
 honghyok.kim@yale.edu
