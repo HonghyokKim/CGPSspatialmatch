@@ -3,7 +3,7 @@ This is an R package, CGPSspatialmatch
 
 Manuscript: Adjustment for Unmeasured Spatial Confounding in Settings of Continuous Exposure Conditional on the Binary Exposure Status: Conditional Generalized Propensity Score-Based Spatial Matching
 
-Authors: Honghyok Kim, Michelle Bell. Pre-print available at https://arxiv.org/abs/2202.00814; (the manuscript is under revision for a journal)
+Authors: Honghyok Kim, Michelle Bell. Pre-print available at https://arxiv.org/abs/2202.00814; (the manuscript is under revision for a peer-reviewed publication)
 
 To install this in R, devtools::install_github('HonghyokKim/CGPSspatialmatch')
 
